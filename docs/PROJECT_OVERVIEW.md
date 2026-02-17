@@ -32,7 +32,7 @@ Openhire is an open-source, AI-powered hiring platform that lets companies run f
 | AI — Text | OpenAI GPT-4o (`openai`, `langchain`) | Question generation, transcript analysis, insights |
 | State | React Context + TanStack React Query | Contexts for auth-scoped data; React Query where needed |
 | Forms | React Hook Form + Zod | All dashboard forms |
-| Linter | Biome | Replaces ESLint + Prettier |
+| Linter | Biome | No Changed needed |
 | Package Manager | npm / yarn | `yarn dev` to start |
 | Containers | Docker + Docker Compose | App only; no DB service yet |
 
