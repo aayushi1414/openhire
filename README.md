@@ -1,8 +1,4 @@
-[![GitHub stars](https://img.shields.io/github/stars/brijeshmarch16/openhire?style=social)](https://github.com/brijeshmarch16/openhire/stargazers)
-![License](https://img.shields.io/github/license/brijeshmarch16/openhire)
-[![Twitter Follow](https://img.shields.io/twitter/follow/brijeshmarch?style=social)](https://x.com/brijeshmarch)
-
-# Openhire - AI-powered voice interviewer for hiring 💼
+# Openhire
 
 Openhire is an open source platform for companies to conduct AI powered hiring interviews with their candidates.
 
@@ -17,7 +13,7 @@ Openhire is an open source platform for companies to conduct AI powered hiring i
   </picture>
 </div>
 
-## Key Features
+## Features
 
 - **🎯 Interview Creation:** Instantly generate tailored interview questions from any job description.
 - **🔗 One-Click Sharing:** Generate and share unique interview links with candidates in seconds.
