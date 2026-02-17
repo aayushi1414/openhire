@@ -18,7 +18,7 @@ Generate questions from a job description → share a link → AI conducts the i
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 14 (App Router) |
+| Framework | Next.js (App Router) |
 | Auth | Better Auth (self-hosted) |
 | Database | Postgres + Drizzle ORM |
 | AI Voice | Retell AI |
