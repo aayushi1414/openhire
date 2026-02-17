@@ -12,15 +12,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useResponses } from "@/contexts/responses.context";
 import { isLightColor, testEmail } from "@/lib/utils";
-import { FeedbackService } from "@/services/feedback.service";
-import { InterviewerService } from "@/services/interviewers.service";
-import { ResponseService } from "@/services/responses.service";
+import { submitFeedback } from "@/services/feedback.service";
+import { getInterviewer } from "@/services/interviewers.service";
+import { createResponse, getAllEmails, saveResponse } from "@/services/responses.service";
 import type { Interview } from "@/types/interview";
 import type { FeedbackData } from "@/types/response";
-import axios from "axios";
-import { AlarmClockIcon, ArrowUpRightSquareIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
+import { registerCall } from "@/actions/call.actions";
+import { AlarmClockIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import { RetellWebClient } from "retell-client-js-sdk";
@@ -36,14 +35,6 @@ type InterviewProps = {
   interview: Interview;
 };
 
-type registerCallResponseType = {
-  data: {
-    registerCallResponse: {
-      call_id: string;
-      access_token: string;
-    };
-  };
-};
 
 type transcriptType = {
   role: string;
@@ -51,7 +42,6 @@ type transcriptType = {
 };
 
 function Call({ interview }: InterviewProps) {
-  const { createResponse } = useResponses();
   const [lastInterviewerResponse, setLastInterviewerResponse] = useState<string>("");
   const [lastUserResponse, setLastUserResponse] = useState<string>("");
   const [activeTurn, setActiveTurn] = useState<string>("");
@@ -76,7 +66,7 @@ function Call({ interview }: InterviewProps) {
 
   const handleFeedbackSubmit = async (formData: Omit<FeedbackData, "interview_id">) => {
     try {
-      const result = await FeedbackService.submitFeedback({
+      const result = await submitFeedback({
         ...formData,
         interview_id: interview.id,
       });
@@ -187,14 +177,14 @@ function Call({ interview }: InterviewProps) {
 
   const startConversation = async () => {
     const data = {
-      mins: interview?.time_duration,
+      mins: interview?.timeDuration,
       objective: interview?.objective,
       questions: interview?.questions.map((q) => q.question).join(", "),
       name: name || "not provided",
     };
     setLoading(true);
 
-    const oldUserEmails: string[] = (await ResponseService.getAllEmails(interview.id)).map(
+    const oldUserEmails: string[] = (await getAllEmails(interview.id)).map(
       (item) => item.email,
     );
     const OldUser =
@@ -204,24 +194,30 @@ function Call({ interview }: InterviewProps) {
     if (OldUser) {
       setIsOldUser(true);
     } else {
-      const registerCallResponse: registerCallResponseType = await axios.post(
-        "/api/register-call",
-        { dynamic_data: data, interviewer_id: interview?.interviewer_id },
+      const result = await registerCall(
+        Number(interview?.interviewerId),
+        data,
       );
-      if (registerCallResponse.data.registerCallResponse.access_token) {
+
+      if (!result.success) {
+        console.error("Failed to register call:", result.error);
+        setLoading(false);
+        return;
+      }
+
+      const { call_id, access_token } = result.data;
+
+      if (access_token) {
         await webClient
-          .startCall({
-            accessToken: registerCallResponse.data.registerCallResponse.access_token,
-          })
+          .startCall({ accessToken: access_token })
           .catch(console.error);
         setIsCalling(true);
         setIsStarted(true);
+        setCallId(call_id);
 
-        setCallId(registerCallResponse?.data?.registerCallResponse?.call_id);
-
-        const response = await createResponse({
-          interview_id: interview.id,
-          call_id: registerCallResponse.data.registerCallResponse.call_id,
+        await createResponse({
+          interviewId: interview.id,
+          callId: call_id,
           email: email,
           name: name,
         });
@@ -234,26 +230,26 @@ function Call({ interview }: InterviewProps) {
   };
 
   useEffect(() => {
-    if (interview?.time_duration) {
-      setInterviewTimeDuration(interview?.time_duration);
+    if (interview?.timeDuration) {
+      setInterviewTimeDuration(interview?.timeDuration);
     }
   }, [interview]);
 
   useEffect(() => {
     const fetchInterviewer = async () => {
-      const interviewer = await InterviewerService.getInterviewer(interview.interviewer_id);
+      const interviewer = await getInterviewer(interview.interviewerId);
       setInterviewerImg(interviewer.image);
     };
     fetchInterviewer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [interview.interviewer_id]);
+  }, [interview.interviewerId]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (isEnded) {
       const updateInterview = async () => {
-        await ResponseService.saveResponse(
-          { is_ended: true, tab_switch_count: tabSwitchCount },
+        await saveResponse(
+          { isEnded: true, tabSwitchCount: tabSwitchCount },
           callId,
         );
       };
@@ -291,11 +287,11 @@ function Call({ interview }: InterviewProps) {
                 <div className="flex mt-2 flex-row">
                   <AlarmClockIcon
                     className="text-indigo-600 h-[1rem] w-[1rem] rotate-0 scale-100  dark:-rotate-90 dark:scale-0 mr-2 font-bold"
-                    style={{ color: interview.theme_color }}
+                    style={{ color: interview.themeColor }}
                   />
                   <div className="text-sm font-normal">
                     Expected duration:{" "}
-                    <span className="font-bold" style={{ color: interview.theme_color }}>
+                    <span className="font-bold" style={{ color: interview.themeColor }}>
                       {interviewTimeDuration} mins{" "}
                     </span>
                     or less
@@ -306,10 +302,10 @@ function Call({ interview }: InterviewProps) {
             {!isStarted && !isEnded && !isOldUser && (
               <div className="w-fit min-w-[400px] max-w-[400px] mx-auto mt-2  border border-indigo-200 rounded-md p-2 m-2 bg-slate-50">
                 <div>
-                  {interview?.logo_url && (
+                  {interview?.logoUrl && (
                     <div className="p-1 flex justify-center">
                       <Image
-                        src={interview?.logo_url}
+                        src={interview?.logoUrl}
                         alt="Logo"
                         className="h-10 w-auto"
                         width={100}
@@ -325,7 +321,7 @@ function Call({ interview }: InterviewProps) {
                       {"\n\n"}Note: Tab switching will be recorded.
                     </p>
                   </div>
-                  {!interview?.is_anonymous && (
+                  {!interview?.isAnonymous && (
                     <div className="flex flex-col gap-2 justify-center">
                       <div className="flex justify-center">
                         <input
@@ -350,19 +346,19 @@ function Call({ interview }: InterviewProps) {
                   <Button
                     className="min-w-20 h-10 rounded-lg flex flex-row justify-center mb-8"
                     style={{
-                      backgroundColor: interview.theme_color ?? "#4F46E5",
-                      color: isLightColor(interview.theme_color ?? "#4F46E5") ? "black" : "white",
+                      backgroundColor: interview.themeColor ?? "#4F46E5",
+                      color: isLightColor(interview.themeColor ?? "#4F46E5") ? "black" : "white",
                     }}
-                    disabled={Loading || (!interview?.is_anonymous && (!isValidEmail || !name))}
+                    disabled={Loading || (!interview?.isAnonymous && (!isValidEmail || !name))}
                     onClick={startConversation}
                   >
                     {!Loading ? "Start Interview" : <MiniLoader />}
                   </Button>
                   <AlertDialog>
-                    <AlertDialogTrigger>
+                    <AlertDialogTrigger asChild>
                       <Button
                         className="bg-white border ml-2 text-black min-w-15 h-10 rounded-lg flex flex-row justify-center mb-8"
-                        style={{ borderColor: interview.theme_color }}
+                        style={{ borderColor: interview.themeColor }}
                         disabled={Loading}
                       >
                         Exit
@@ -407,7 +403,7 @@ function Call({ interview }: InterviewProps) {
                         height={120}
                         className={`object-cover object-center mx-auto my-auto ${
                           activeTurn === "agent"
-                            ? `border-4 border-[${interview.theme_color}] rounded-full`
+                            ? `border-4 border-[${interview.themeColor}] rounded-full`
                             : ""
                         }`}
                       />
@@ -433,7 +429,7 @@ function Call({ interview }: InterviewProps) {
                       height={120}
                       className={`object-cover object-center mx-auto my-auto ${
                         activeTurn === "user"
-                          ? `border-4 border-[${interview.theme_color}] rounded-full`
+                          ? `border-4 border-[${interview.themeColor}] rounded-full`
                           : ""
                       }`}
                     />
@@ -530,20 +526,14 @@ function Call({ interview }: InterviewProps) {
             )}
           </div>
         </Card>
-        <a
-          className="flex flex-row justify-center align-middle mt-3"
-          href="https://folo-up.co/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <div className="text-center text-md font-semibold mr-2  ">
+        <div className="flex flex-row justify-center align-middle mt-3">
+          <div className="text-center text-md font-semibold mr-2">
             Powered by{" "}
             <span className="font-bold">
-              Folo<span className="text-indigo-600">Up</span>
+              Open<span className="text-indigo-600">Hire</span>
             </span>
           </div>
-          <ArrowUpRightSquareIcon className="h-[1.5rem] w-[1.5rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-indigo-500 " />
-        </a>
+        </div>
       </div>
     </div>
   );

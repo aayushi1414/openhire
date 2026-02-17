@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useInterviewers } from "@/contexts/interviewers.context";
+import { getAllInterviewers } from "@/services/interviewers.service";
 import type { InterviewBase, Question } from "@/types/interview";
 import type { Interviewer } from "@/types/interviewer";
 import axios from "axios";
 import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import FileUpload from "../fileUpload";
 
@@ -35,19 +35,20 @@ function DetailsPopup({
   fileName,
   setFileName,
 }: Props) {
-  const { interviewers } = useInterviewers();
+  const [interviewers, setInterviewers] = useState<Interviewer[]>([]);
+  const fetchedRef = useRef(false);
   const [isClicked, setIsClicked] = useState(false);
   const [openInterviewerDetails, setOpenInterviewerDetails] = useState(false);
   const [interviewerDetails, setInterviewerDetails] = useState<Interviewer>();
 
   const [name, setName] = useState(interviewData.name);
-  const [selectedInterviewer, setSelectedInterviewer] = useState(interviewData.interviewer_id);
+  const [selectedInterviewer, setSelectedInterviewer] = useState(interviewData.interviewerId);
   const [objective, setObjective] = useState(interviewData.objective);
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(interviewData.is_anonymous);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(interviewData.isAnonymous);
   const [numQuestions, setNumQuestions] = useState(
-    interviewData.question_count === 0 ? "" : String(interviewData.question_count),
+    interviewData.questionCount === 0 ? "" : String(interviewData.questionCount),
   );
-  const [duration, setDuration] = useState(interviewData.time_duration);
+  const [duration, setDuration] = useState(interviewData.timeDuration);
   const [uploadedDocumentContext, setUploadedDocumentContext] = useState("");
 
   const slideLeft = (id: string, value: number) => {
@@ -81,7 +82,7 @@ function DetailsPopup({
     const updatedQuestions = generatedQuestionsResponse.questions.map((question: Question) => ({
       id: uuidv4(),
       question: question.question.trim(),
-      follow_up_count: 1,
+      followUpCount: 1,
     }));
 
     const updatedInterviewData = {
@@ -89,11 +90,11 @@ function DetailsPopup({
       name: name.trim(),
       objective: objective.trim(),
       questions: updatedQuestions,
-      interviewer_id: selectedInterviewer,
-      question_count: Number(numQuestions),
-      time_duration: duration,
+      interviewerId: selectedInterviewer,
+      questionCount: Number(numQuestions),
+      timeDuration: duration,
       description: generatedQuestionsResponse.description,
-      is_anonymous: isAnonymous,
+      isAnonymous: isAnonymous,
     };
     setInterviewData(updatedInterviewData);
   };
@@ -105,15 +106,22 @@ function DetailsPopup({
       ...interviewData,
       name: name.trim(),
       objective: objective.trim(),
-      questions: [{ id: uuidv4(), question: "", follow_up_count: 1 }],
-      interviewer_id: selectedInterviewer,
-      question_count: Number(numQuestions),
-      time_duration: String(duration),
+      questions: [{ id: uuidv4(), question: "", followUpCount: 1 }],
+      interviewerId: selectedInterviewer,
+      questionCount: Number(numQuestions),
+      timeDuration: String(duration),
       description: "",
-      is_anonymous: isAnonymous,
+      isAnonymous: isAnonymous,
     };
     setInterviewData(updatedInterviewData);
   };
+
+  useEffect(() => {
+    if (!fetchedRef.current) {
+      fetchedRef.current = true;
+      getAllInterviewers().then((data) => setInterviewers(data as Interviewer[]));
+    }
+  }, []);
 
   useEffect(() => {
     if (!open) {

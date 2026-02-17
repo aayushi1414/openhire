@@ -30,12 +30,12 @@ const questionCard = ({
                   <TooltipTrigger asChild>
                     <Button
                       className={`text-xs h-7  hover:bg-indigo-800  ${
-                        questionData?.follow_up_count === 1 ? "bg-indigo-600" : "opacity-50"
+                        questionData?.followUpCount === 1 ? "bg-indigo-600" : "opacity-50"
                       } `}
                       onClick={() =>
                         onQuestionChange(questionData.id, {
                           ...questionData,
-                          follow_up_count: 1,
+                          followUpCount: 1,
                         })
                       }
                     >
@@ -53,12 +53,12 @@ const questionCard = ({
                   <TooltipTrigger asChild>
                     <Button
                       className={`text-xs h-7  hover:bg-indigo-800 ${
-                        questionData?.follow_up_count === 2 ? "bg-indigo-600" : "opacity-50"
+                        questionData?.followUpCount === 2 ? "bg-indigo-600" : "opacity-50"
                       } `}
                       onClick={() =>
                         onQuestionChange(questionData.id, {
                           ...questionData,
-                          follow_up_count: 2,
+                          followUpCount: 2,
                         })
                       }
                     >
@@ -76,12 +76,12 @@ const questionCard = ({
                   <TooltipTrigger asChild>
                     <Button
                       className={`text-xs h-7 hover:bg-indigo-800  ${
-                        questionData?.follow_up_count === 3 ? "bg-indigo-600" : "opacity-50"
+                        questionData?.followUpCount === 3 ? "bg-indigo-600" : "opacity-50"
                       } `}
                       onClick={() =>
                         onQuestionChange(questionData.id, {
                           ...questionData,
-                          follow_up_count: 3,
+                          followUpCount: 3,
                         })
                       }
                     >

@@ -1,19 +1,23 @@
+"use server";
+
 import type { FeedbackData } from "@/types/response";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { db } from "@/lib/db";
+import { feedback } from "@/lib/db/schema";
 
-const supabase = createClientComponentClient();
+export const submitFeedback = async (feedbackData: FeedbackData) => {
+  const [created] = await db
+    .insert(feedback)
+    .values({
+      interviewId: feedbackData.interview_id,
+      satisfaction: feedbackData.satisfaction,
+      feedbackText: feedbackData.feedback,
+      email: feedbackData.email,
+    })
+    .returning();
 
-const submitFeedback = async (feedbackData: FeedbackData) => {
-  const { error, data } = await supabase.from("feedback").insert(feedbackData).select();
-
-  if (error) {
-    console.error("Error submitting feedback:", error);
-    throw error;
+  if (!created) {
+    throw new Error("Failed to submit feedback");
   }
 
-  return data;
-};
-
-export const FeedbackService = {
-  submitFeedback,
+  return created;
 };

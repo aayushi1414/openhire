@@ -1,128 +1,101 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+"use server";
 
-const supabase = createClientComponentClient();
+import { db } from "@/lib/db";
+import { response } from "@/lib/db/schema";
+import { eq, and, desc } from "drizzle-orm";
 
-const createResponse = async (payload: any) => {
-  const { error, data } = await supabase
-    .from("response")
-    .insert({ ...payload })
-    .select("id");
-
-  if (error) {
-    console.log(error);
-
-    return [];
-  }
-
-  return data[0]?.id;
-};
-
-const saveResponse = async (payload: any, call_id: string) => {
-  const { error, data } = await supabase
-    .from("response")
-    .update({ ...payload })
-    .eq("call_id", call_id);
-  if (error) {
-    console.log(error);
-
-    return [];
-  }
-
-  return data;
-};
-
-const getAllResponses = async (interviewId: string) => {
+export const createResponse = async (payload: any) => {
   try {
-    const { data, error } = await supabase
-      .from("response")
-      .select("*")
-      .eq("interview_id", interviewId)
-      .or("details.is.null, details->call_analysis.not.is.null")
-      .eq("is_ended", true)
-      .order("created_at", { ascending: false });
+    const [created] = await db.insert(response).values(payload).returning({ id: response.id });
+    return created?.id ?? null;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
+
+export const saveResponse = async (payload: any, call_id: string) => {
+  try {
+    const updated = await db
+      .update(response)
+      .set(payload)
+      .where(eq(response.callId, call_id))
+      .returning();
+    return updated;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
+
+export const getAllResponses = async (interviewId: string) => {
+  try {
+    const data = await db
+      .select()
+      .from(response)
+      .where(
+        and(
+          eq(response.interviewId, interviewId),
+          eq(response.isEnded, true),
+        ),
+      )
+      .orderBy(desc(response.createdAt));
 
     return data || [];
   } catch (error) {
     console.log(error);
-
     return [];
   }
 };
 
-const getResponseCountByOrganizationId = async (organizationId: string): Promise<number> => {
+export const getAllEmails = async (interviewId: string) => {
   try {
-    const { count, error } = await supabase
-      .from("interview")
-      .select("response(id)", { count: "exact", head: true }) // join + count
-      .eq("organization_id", organizationId);
-
-    return count ?? 0;
-  } catch (error) {
-    console.log(error);
-
-    return 0;
-  }
-};
-
-const getAllEmailAddressesForInterview = async (interviewId: string) => {
-  try {
-    const { data, error } = await supabase
-      .from("response")
-      .select("email")
-      .eq("interview_id", interviewId);
+    const data = await db
+      .select({ email: response.email })
+      .from(response)
+      .where(eq(response.interviewId, interviewId));
 
     return data || [];
   } catch (error) {
     console.log(error);
-
     return [];
   }
 };
 
-const getResponseByCallId = async (id: string) => {
+export const getResponseByCallId = async (id: string) => {
   try {
-    const { data, error } = await supabase.from("response").select("*").filter("call_id", "eq", id);
+    const data = await db
+      .select()
+      .from(response)
+      .where(eq(response.callId, id));
 
     return data ? data[0] : null;
   } catch (error) {
     console.log(error);
-
     return [];
   }
 };
 
-const deleteResponse = async (id: string) => {
-  const { error, data } = await supabase.from("response").delete().eq("call_id", id);
-  if (error) {
+export const deleteResponse = async (id: string) => {
+  try {
+    const deleted = await db.delete(response).where(eq(response.callId, id)).returning();
+    return deleted;
+  } catch (error) {
     console.log(error);
-
     return [];
   }
-
-  return data;
 };
 
-const updateResponse = async (payload: any, call_id: string) => {
-  const { error, data } = await supabase
-    .from("response")
-    .update({ ...payload })
-    .eq("call_id", call_id);
-  if (error) {
+export const updateResponse = async (payload: any, call_id: string) => {
+  try {
+    const updated = await db
+      .update(response)
+      .set(payload)
+      .where(eq(response.callId, call_id))
+      .returning();
+    return updated;
+  } catch (error) {
     console.log(error);
-
     return [];
   }
-
-  return data;
-};
-
-export const ResponseService = {
-  createResponse,
-  saveResponse,
-  updateResponse,
-  getAllResponses,
-  getResponseByCallId,
-  deleteResponse,
-  getResponseCountByOrganizationId,
-  getAllEmails: getAllEmailAddressesForInterview,
 };

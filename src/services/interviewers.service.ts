@@ -1,75 +1,53 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+"use server";
 
-const supabase = createClientComponentClient();
+import { db } from "@/lib/db";
+import { interviewer } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 
-const getAllInterviewers = async (clientId = "") => {
+export const getAllInterviewers = async (clientId = "") => {
   try {
-    const { data: clientData, error: clientError } = await supabase.from("interviewer").select("*");
-
-    if (clientError) {
-      console.error(`Error fetching interviewers for clientId ${clientId}:`, clientError);
-
-      return [];
-    }
-
-    return clientData || [];
+    const data = await db.select().from(interviewer);
+    return data || [];
   } catch (error) {
     console.log(error);
-
     return [];
   }
 };
 
-const createInterviewer = async (payload: any) => {
-  // Check for existing interviewer with the same name
-  const { data: existingInterviewer, error: checkError } = await supabase
-    .from("interviewer")
-    .select("*")
-    .eq("name", payload.name)
-    .filter("agent_id", "eq", payload.agent_id)
-    .single();
+export const createInterviewer = async (payload: any) => {
+  try {
+    // Check for existing interviewer with the same name AND agent_id
+    const existing = await db
+      .select()
+      .from(interviewer)
+      .where(and(eq(interviewer.name, payload.name), eq(interviewer.agentId, payload.agentId)))
+      .limit(1);
 
-  if (checkError && checkError.code !== "PGRST116") {
-    console.error("Error checking existing interviewer:", checkError);
+    if (existing.length > 0) {
+      console.error("An interviewer with this name already exists");
+      return null;
+    }
 
-    return null;
-  }
-
-  if (existingInterviewer) {
-    console.error("An interviewer with this name already exists");
-
-    return null;
-  }
-
-  const { error, data } = await supabase.from("interviewer").insert({ ...payload });
-
-  if (error) {
+    const [created] = await db.insert(interviewer).values(payload).returning();
+    return created ?? null;
+  } catch (error) {
     console.error("Error creating interviewer:", error);
-
     return null;
   }
-
-  return data;
 };
 
-const getInterviewer = async (interviewerId: bigint) => {
-  const { data: interviewerData, error: interviewerError } = await supabase
-    .from("interviewer")
-    .select("*")
-    .eq("id", interviewerId)
-    .single();
+export const getInterviewer = async (interviewerId: number | bigint) => {
+  try {
+    const [data] = await db
+      .select()
+      .from(interviewer)
+      .where(eq(interviewer.id, Number(interviewerId)))
+      .limit(1);
 
-  if (interviewerError) {
-    console.error("Error fetching interviewer:", interviewerError);
-
+    return data ?? null;
+  } catch (error) {
+    console.error("Error fetching interviewer:", error);
     return null;
   }
-
-  return interviewerData;
 };
 
-export const InterviewerService = {
-  getAllInterviewers,
-  createInterviewer,
-  getInterviewer,
-};

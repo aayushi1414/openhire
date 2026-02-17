@@ -1,4 +1,4 @@
-import axios from "axios";
+import { analyzeCall } from "@/actions/call.actions";
 import { type NextRequest, NextResponse } from "next/server";
 import { Retell } from "retell-sdk";
 
@@ -9,9 +9,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
   }
 
+  if (!process.env.RETELL_API_KEY) {
+    console.error("Missing required environment variable: RETELL_API_KEY");
+    return NextResponse.json({ error: "Retell API key is not configured" }, { status: 500 });
+  }
+
+  const rawBody = await req.text();
+  const body = JSON.parse(rawBody);
+
   if (
     !Retell.verify(
-      JSON.stringify(req.body),
+      rawBody,
       apiKey,
       req.headers.get("x-retell-signature") as string,
     )
@@ -21,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const { event, call } = req.body as unknown as { event: string; call: any };
+  const { event, call } = body as { event: string; call: any };
 
   switch (event) {
     case "call_started":
@@ -31,9 +39,7 @@ export async function POST(req: NextRequest) {
       console.log("Call ended event received", call.call_id);
       break;
     case "call_analyzed": {
-      const result = await axios.post("/api/get-call", {
-        id: call.call_id,
-      });
+      await analyzeCall(call.call_id);
       console.log("Call analyzed event received", call.call_id);
       break;
     }
@@ -41,6 +47,5 @@ export async function POST(req: NextRequest) {
       console.log("Received an unknown event:", event);
   }
 
-  // Acknowledge the receipt of the event
-  return NextResponse.json({ status: 204 });
+  return new NextResponse(null, { status: 204 });
 }

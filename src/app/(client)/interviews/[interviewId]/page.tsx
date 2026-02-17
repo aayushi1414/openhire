@@ -17,15 +17,13 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useInterviews } from "@/contexts/interviews.context";
+import { getInterviewById } from "@/services/interviews.service";
 import { CandidateStatus } from "@/lib/enum";
 import { formatTimestampToDateHHMM } from "@/lib/utils";
-import { ClientService } from "@/services/clients.service";
-import { InterviewService } from "@/services/interviews.service";
-import { ResponseService } from "@/services/responses.service";
+import { updateInterview } from "@/services/interviews.service";
+import { getAllResponses, saveResponse } from "@/services/responses.service";
 import type { Interview } from "@/types/interview";
 import type { Response } from "@/types/response";
-import { useOrganization } from "@clerk/nextjs";
 import { Eye, Filter, Palette, Pencil, Share2, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, use } from "react";
@@ -49,43 +47,35 @@ function InterviewHome({ params, searchParams }: Props) {
   const resolvedSearchParams = use(searchParams);
   const [interview, setInterview] = useState<Interview>();
   const [responses, setResponses] = useState<Response[]>();
-  const { getInterviewById } = useInterviews();
   const [isSharePopupOpen, setIsSharePopupOpen] = useState(false);
   const router = useRouter();
   const [isActive, setIsActive] = useState<boolean>(true);
-  const [currentPlan, setCurrentPlan] = useState<string>("");
   const [isGeneratingInsights, setIsGeneratingInsights] = useState<boolean>(false);
   const [isViewed, setIsViewed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [themeColor, setThemeColor] = useState<string>("#4F46E5");
   const [iconColor, seticonColor] = useState<string>("#4F46E5");
-  const { organization } = useOrganization();
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
 
   const seeInterviewPreviewPage = () => {
     const protocol = base_url?.includes("localhost") ? "http" : "https";
-    if (interview?.url) {
-      const url = interview?.readable_slug
-        ? `${protocol}://${base_url}/call/${interview?.readable_slug}`
-        : interview.url.startsWith("http")
-          ? interview.url
-          : `https://${interview.url}`;
-      window.open(url, "_blank");
-    } else {
-      console.error("Interview URL is null or undefined.");
-    }
+    const url = interview?.readableSlug
+      ? `${protocol}://${base_url}/call/${interview.readableSlug}`
+      : `${protocol}://${base_url}/call/${interview?.id}`;
+    window.open(url, "_blank");
   };
 
   useEffect(() => {
     const fetchInterview = async () => {
+      if (isGeneratingInsights) return;
       try {
         const response = await getInterviewById(resolvedParams.interviewId);
         setInterview(response);
-        setIsActive(response.is_active);
+        setIsActive(response.isActive);
         setIsViewed(response.is_viewed);
-        setThemeColor(response.theme_color ?? "#4F46E5");
-        seticonColor(response.theme_color ?? "#4F46E5");
+        setThemeColor(response.themeColor ?? "#4F46E5");
+        seticonColor(response.themeColor ?? "#4F46E5");
         setLoading(true);
       } catch (error) {
         console.error(error);
@@ -93,31 +83,14 @@ function InterviewHome({ params, searchParams }: Props) {
         setLoading(false);
       }
     };
-    if (!interview || !isGeneratingInsights) {
-      fetchInterview();
-    }
-  }, [getInterviewById, resolvedParams.interviewId, isGeneratingInsights, interview]);
+    fetchInterview();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedParams.interviewId, isGeneratingInsights]);
 
-  useEffect(() => {
-    const fetchOrganizationData = async () => {
-      try {
-        if (organization?.id) {
-          const data = await ClientService.getOrganizationById(organization.id);
-          if (data?.plan) {
-            setCurrentPlan(data.plan);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching organization data:", error);
-      }
-    };
-
-    fetchOrganizationData();
-  }, [organization]);
   useEffect(() => {
     const fetchResponses = async () => {
       try {
-        const response = await ResponseService.getAllResponses(resolvedParams.interviewId);
+        const response = await getAllResponses(resolvedParams.interviewId);
         setResponses(response);
         setLoading(true);
       } catch (error) {
@@ -141,7 +114,7 @@ function InterviewHome({ params, searchParams }: Props) {
 
   const handleResponseClick = async (response: Response) => {
     try {
-      await ResponseService.saveResponse({ is_viewed: true }, response.call_id);
+      await saveResponse({ isViewed: true }, response.call_id);
       if (responses) {
         const updatedResponses = responses.map((r) =>
           r.call_id === response.call_id ? { ...r, is_viewed: true } : r,
@@ -159,8 +132,8 @@ function InterviewHome({ params, searchParams }: Props) {
       const updatedIsActive = !isActive;
       setIsActive(updatedIsActive);
 
-      await InterviewService.updateInterview(
-        { is_active: updatedIsActive },
+      await updateInterview(
+        { isActive: updatedIsActive },
         resolvedParams.interviewId,
       );
 
@@ -180,7 +153,7 @@ function InterviewHome({ params, searchParams }: Props) {
 
   const handleThemeColorChange = async (newColor: string) => {
     try {
-      await InterviewService.updateInterview({ theme_color: newColor }, resolvedParams.interviewId);
+      await updateInterview({ themeColor: newColor }, resolvedParams.interviewId);
 
       toast.success("Theme color updated", {
         position: "bottom-right",
@@ -330,27 +303,12 @@ function InterviewHome({ params, searchParams }: Props) {
             </TooltipProvider>
 
             <div className="inline-flex cursor-pointer">
-              {currentPlan === "free_trial_over" ? (
-                <>
-                  <span className="ms-3 my-auto text-sm">Inactive</span>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipContent className="bg-zinc-300" side="bottom" sideOffset={4}>
-                        Upgrade your plan to reactivate
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </>
-              ) : (
-                <>
-                  <span className="ms-3 my-auto text-sm">Active</span>
-                  <Switch
-                    checked={isActive}
-                    className={`ms-3 my-auto ${isActive ? "bg-indigo-600" : "bg-[#E6E7EB]"}`}
-                    onCheckedChange={handleToggle}
-                  />
-                </>
-              )}
+              <span className="ms-3 my-auto text-sm">Active</span>
+              <Switch
+                checked={isActive}
+                className={`ms-3 my-auto ${isActive ? "bg-indigo-600" : "bg-[#E6E7EB]"}`}
+                onCheckedChange={handleToggle}
+              />
             </div>
           </div>
           <div className="flex flex-row w-full p-2 h-[85%] gap-1 ">
@@ -519,9 +477,9 @@ function InterviewHome({ params, searchParams }: Props) {
         <SharePopup
           open={isSharePopupOpen}
           shareContent={
-            interview?.readable_slug
-              ? `${base_url}/call/${interview?.readable_slug}`
-              : (interview?.url as string)
+            interview?.readableSlug
+              ? `${base_url}/call/${interview.readableSlug}`
+              : `${base_url}/call/${interview?.id}`
           }
           onClose={closeSharePopup}
         />

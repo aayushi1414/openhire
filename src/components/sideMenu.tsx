@@ -15,11 +15,11 @@ function SideMenu() {
           <button
             type="button"
             className={`flex flex-row p-3 rounded-md hover:bg-slate-200 cursor-pointer ${
-              pathname.endsWith("/dashboard") || pathname.includes("/interviews")
+              pathname === "/" || pathname.includes("/interviews")
                 ? "bg-indigo-200"
                 : "bg-slate-100"
             }`}
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/")}
           >
             <PlayCircleIcon className="font-thin	 mr-2" />
             <p className="font-medium ">Interviews</p>
@@ -29,7 +29,7 @@ function SideMenu() {
             className={`flex flex-row p-3 rounded-md hover:bg-slate-200 cursor-pointer ${
               pathname.endsWith("/interviewers") ? "bg-indigo-200" : "bg-slate-100"
             }`}
-            onClick={() => router.push("/dashboard/interviewers")}
+            onClick={() => router.push("/interviewers")}
           >
             <SpeechIcon className="font-thin mr-2" />
             <p className="font-medium ">Interviewers</p>

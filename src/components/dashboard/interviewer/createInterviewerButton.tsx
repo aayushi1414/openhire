@@ -1,20 +1,27 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { InterviewerService } from "@/services/interviewers.service";
-import axios from "axios";
+import { createDefaultInterviewers } from "@/actions/interviewers.actions";
 import { Loader2, Plus } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 function CreateInterviewerButton() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
-  const createInterviewers = async () => {
-    setIsLoading(true);
-    const response = await axios.get("/api/create-interviewer", {});
-    console.log(response);
-    setIsLoading(false);
-    InterviewerService.getAllInterviewers();
+  const createInterviewers = () => {
+    startTransition(async () => {
+      const result = await createDefaultInterviewers();
+
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+
+      router.refresh();
+    });
   };
 
   return (
@@ -24,7 +31,7 @@ function CreateInterviewerButton() {
         onClick={() => createInterviewers()}
       >
         <CardContent className="p-0">
-          {isLoading ? (
+          {isPending ? (
             <div className="w-full h-20 overflow-hidden flex justify-center items-center">
               <Loader2 size={40} className="animate-spin" />
             </div>

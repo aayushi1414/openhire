@@ -17,6 +17,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Transcript is required" }, { status: 400 });
     }
 
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("Missing required environment variable: OPENAI_API_KEY");
+      return NextResponse.json({ error: "OpenAI API key is not configured" }, { status: 500 });
+    }
+
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
       maxRetries: 5,

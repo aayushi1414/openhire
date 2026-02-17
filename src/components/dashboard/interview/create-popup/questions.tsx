@@ -1,14 +1,15 @@
 import QuestionCard from "@/components/dashboard/interview/create-popup/questionCard";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useInterviews } from "@/contexts/interviews.context";
 import type { InterviewBase, Question } from "@/types/interview";
-import { useClerk, useOrganization } from "@clerk/nextjs";
-import axios from "axios";
+import { useSession } from "@/lib/auth/client";
+import { createInterview } from "@/actions/interviews.actions";
 import { Plus } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
 
 interface Props {
   interviewData: InterviewBase;
@@ -17,13 +18,13 @@ interface Props {
 }
 
 function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
-  const { user } = useClerk();
-  const { organization } = useOrganization();
-  const [isClicked, setIsClicked] = useState(false);
+  const { data: session } = useSession();
+  const user = session?.user;
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const [questions, setQuestions] = useState<Question[]>(interviewData.questions);
   const [description, setDescription] = useState<string>(interviewData.description.trim());
-  const { fetchInterviews } = useInterviews();
 
   const endOfListRef = useRef<HTMLDivElement>(null);
   const prevQuestionLengthRef = useRef(questions.length);
@@ -42,7 +43,7 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
         questions.map((question) => ({
           ...question,
           question: "",
-          follow_up_count: 1,
+          followUpCount: 1,
         })),
       );
 
@@ -52,37 +53,36 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
   };
 
   const handleAddQuestion = () => {
-    if (questions.length < interviewData.question_count) {
-      setQuestions([...questions, { id: uuidv4(), question: "", follow_up_count: 1 }]);
+    if (questions.length < interviewData.questionCount) {
+      setQuestions([...questions, { id: uuidv4(), question: "", followUpCount: 1 }]);
     }
   };
 
-  const onSave = async () => {
-    try {
-      interviewData.user_id = user?.id || "";
-      interviewData.organization_id = organization?.id || "";
-
+  const onSave = () => {
+    startTransition(async () => {
+      interviewData.userId = user?.id || "";
       interviewData.questions = questions;
       interviewData.description = description;
 
-      // Convert BigInts to strings if necessary
       const sanitizedInterviewData = {
         ...interviewData,
-        interviewer_id: interviewData.interviewer_id.toString(),
-        response_count: interviewData.response_count.toString(),
-        logo_url: organization?.imageUrl || "",
+        interviewerId: interviewData.interviewerId.toString(),
+        responseCount: interviewData.responseCount.toString(),
+        logoUrl: "",
       };
 
-      const response = await axios.post("/api/create-interview", {
-        organizationName: organization?.name,
+      const result = await createInterview({
         interviewData: sanitizedInterviewData,
       });
-      setIsClicked(false);
-      fetchInterviews();
+
+      if (!result.success) {
+        toast.error(result.error);
+        return;
+      }
+
+      router.refresh();
       setOpen(false);
-    } catch (error) {
-      console.error("Error creating interview:", error);
-    }
+    });
   };
 
   useEffect(() => {
@@ -96,7 +96,7 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
     <div>
       <div
         className={`text-center px-1 flex flex-col justify-top items-center w-[38rem] ${
-          interviewData.question_count > 1 ? "h-[29rem]" : ""
+          interviewData.questionCount > 1 ? "h-[29rem]" : ""
         } `}
       >
         <div className="relative flex justify-center w-full">
@@ -124,7 +124,7 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
           ))}
           <div ref={endOfListRef} />
         </ScrollArea>
-        {questions.length < interviewData.question_count ? (
+        {questions.length < interviewData.questionCount ? (
           <button
             type="button"
             className="border-indigo-600 opacity-75 hover:opacity-100 w-fit rounded-full"
@@ -160,18 +160,15 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
       <div className="flex flex-row justify-end items-end w-full">
         <Button
           disabled={
-            isClicked ||
-            questions.length < interviewData.question_count ||
+            isPending ||
+            questions.length < interviewData.questionCount ||
             description.trim() === "" ||
             questions.some((question) => question.question.trim() === "")
           }
           className="bg-indigo-600 hover:bg-indigo-800 mr-5 mt-2"
-          onClick={() => {
-            setIsClicked(true);
-            onSave();
-          }}
+          onClick={onSave}
         >
-          Save
+          {isPending ? "Saving..." : "Save"}
         </Button>
       </div>
     </div>
