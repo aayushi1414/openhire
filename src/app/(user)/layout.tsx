@@ -5,9 +5,10 @@ import Providers from "@/components/providers";
 import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL as string;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: "OpenHire",
   description: "AI powered Interviews",
   icons: {
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     siteName: "OpenHire",
     images: [
       {
-        url: "/openhire.png",
+        url: new URL("/openhire.png", siteUrl).toString(),
         width: 800,
         height: 600,
       },
