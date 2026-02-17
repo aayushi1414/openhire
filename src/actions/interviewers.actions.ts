@@ -11,7 +11,7 @@ const retellClient = new Retell({
 export const createDefaultInterviewers = async () => {
   try {
     const newModel = await retellClient.llm.create({
-      model: "gpt-4o",
+      model: "gpt-4.1",
       general_prompt: RETELL_AGENT_GENERAL_PROMPT,
       general_tools: [
         {

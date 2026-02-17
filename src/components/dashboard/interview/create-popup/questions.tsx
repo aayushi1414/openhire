@@ -9,7 +9,6 @@ import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   interviewData: InterviewBase;
@@ -54,7 +53,7 @@ function QuestionsPopup({ interviewData, setProceed, setOpen }: Props) {
 
   const handleAddQuestion = () => {
     if (questions.length < interviewData.questionCount) {
-      setQuestions([...questions, { id: uuidv4(), question: "", followUpCount: 1 }]);
+      setQuestions([...questions, { id: crypto.randomUUID(), question: "", followUpCount: 1 }]);
     }
   };
 

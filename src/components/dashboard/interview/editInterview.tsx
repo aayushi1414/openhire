@@ -25,7 +25,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
 import { CardTitle } from "../../ui/card";
 
 type EditInterviewProps = {
@@ -79,7 +78,7 @@ function EditInterview({ interview }: EditInterviewProps) {
 
   const handleAddQuestion = () => {
     if (questions.length < numQuestions) {
-      setQuestions([...questions, { id: uuidv4(), question: "", followUpCount: 1 }]);
+      setQuestions([...questions, { id: crypto.randomUUID(), question: "", followUpCount: 1 }]);
     }
   };
 
