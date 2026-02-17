@@ -5,23 +5,24 @@ import Navbar from "@/components/navbar";
 import Providers from "@/components/providers";
 import SideMenu from "@/components/sideMenu";
 import { cn } from "@/lib/utils";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Toaster } from "sonner";
+import { useSession } from "@/lib/auth/client";
+import { useEffect } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const metadata = {
-  title: "FoloUp",
-  description: " AI-powered Interviews",
+  title: "OpenHire",
+  description: "AI-powered Interviews",
   openGraph: {
-    title: "FoloUp",
+    title: "OpenHire",
     description: "AI-powered Interviews",
-    siteName: "FoloUp",
+    siteName: "OpenHire",
     images: [
       {
-        url: "/foloup.png",
+        url: "/openhire.png",
         width: 800,
         height: 600,
       },
@@ -37,49 +38,52 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
   const isAuthRoute = pathname.includes("/sign-in") || pathname.includes("/sign-up");
+
+  useEffect(() => {
+    if (!isPending && !session && !isAuthRoute) {
+      router.replace("/sign-in");
+    }
+  }, [session, isPending, isAuthRoute, router]);
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <title>{metadata.title}</title>
+
         <meta name="description" content={metadata.description} />
         <link rel="icon" href="/browser-client-icon.ico" />
       </head>
       <body className={cn(inter.className, "antialiased overflow-hidden min-h-screen")}>
-        <ClerkProvider
-          dynamic
-          signInFallbackRedirectUrl={"/dashboard"}
-          afterSignOutUrl={"/sign-in"}
-        >
-          <Providers>
-            {isAuthRoute ? (
-              children
-            ) : (
-              <>
-                <Navbar />
-                <div className="flex flex-row h-screen">
-                  <SideMenu />
-                  <div className="ml-[200px] pt-[64px] h-full overflow-y-auto flex-grow">
-                    {children}
-                  </div>
+        <Providers>
+          {isAuthRoute ? (
+            children
+          ) : (
+            <>
+              <Navbar />
+              <div className="flex flex-row h-screen">
+                <SideMenu />
+                <div className="ml-[200px] pt-[64px] h-full overflow-y-auto flex-grow">
+                  {children}
                 </div>
-              </>
-            )}
-            <Toaster
-              toastOptions={{
-                classNames: {
-                  toast: "bg-white",
-                  title: "text-black",
-                  description: "text-red-400",
-                  actionButton: "bg-indigo-400",
-                  cancelButton: "bg-orange-400",
-                  closeButton: "bg-white-400",
-                },
-              }}
-            />
-          </Providers>
-        </ClerkProvider>
+              </div>
+            </>
+          )}
+          <Toaster
+            toastOptions={{
+              classNames: {
+                toast: "bg-white",
+                title: "text-black",
+                description: "text-red-400",
+                actionButton: "bg-indigo-400",
+                cancelButton: "bg-orange-400",
+                closeButton: "bg-white-400",
+              },
+            }}
+          />
+        </Providers>
       </body>
     </html>
   );

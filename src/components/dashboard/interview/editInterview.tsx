@@ -15,15 +15,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
-import { useInterviewers } from "@/contexts/interviewers.context";
-import { useInterviews } from "@/contexts/interviews.context";
-import { InterviewService } from "@/services/interviews.service";
+import { getAllInterviewers } from "@/services/interviewers.service";
+import { updateInterview, deleteInterview } from "@/actions/interviews.actions";
 import type { Interview, Question } from "@/types/interview";
+import type { Interviewer } from "@/types/interviewer";
 import { Plus, SaveIcon, TrashIcon } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { CardTitle } from "../../ui/card";
@@ -33,18 +33,21 @@ type EditInterviewProps = {
 };
 
 function EditInterview({ interview }: EditInterviewProps) {
-  const { interviewers } = useInterviewers();
-  const { fetchInterviews } = useInterviews();
+  const [interviewers, setInterviewers] = useState<Interviewer[]>([]);
+
+  useEffect(() => {
+    getAllInterviewers().then((data) => setInterviewers(data as Interviewer[]));
+  }, []);
 
   const [description, setDescription] = useState<string>(interview?.description || "");
   const [objective, setObjective] = useState<string>(interview?.objective || "");
-  const [numQuestions, setNumQuestions] = useState<number>(interview?.question_count || 1);
-  const [duration, setDuration] = useState<number>(Number(interview?.time_duration));
+  const [numQuestions, setNumQuestions] = useState<number>(interview?.questionCount || 1);
+  const [duration, setDuration] = useState<number>(Number(interview?.timeDuration));
   const [questions, setQuestions] = useState<Question[]>(interview?.questions || []);
-  const [selectedInterviewer, setSelectedInterviewer] = useState(interview?.interviewer_id);
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(interview?.is_anonymous || false);
+  const [selectedInterviewer, setSelectedInterviewer] = useState(interview?.interviewerId);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(interview?.isAnonymous || false);
 
-  const [isClicked, setIsClicked] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const endOfListRef = useRef<HTMLDivElement>(null);
   const prevQuestionLengthRef = useRef(questions.length);
@@ -64,7 +67,7 @@ function EditInterview({ interview }: EditInterviewProps) {
         questions.map((question) => ({
           ...question,
           question: "",
-          follow_up_count: 1,
+          followUpCount: 1,
         })),
       );
 
@@ -76,55 +79,58 @@ function EditInterview({ interview }: EditInterviewProps) {
 
   const handleAddQuestion = () => {
     if (questions.length < numQuestions) {
-      setQuestions([...questions, { id: uuidv4(), question: "", follow_up_count: 1 }]);
+      setQuestions([...questions, { id: uuidv4(), question: "", followUpCount: 1 }]);
     }
   };
 
-  const onSave = async () => {
+  const onSave = () => {
+    if (!interview) return;
+
     const questionCount = questions.length < numQuestions ? questions.length : numQuestions;
 
     const interviewData = {
       objective: objective,
       questions: questions,
-      interviewer_id: Number(selectedInterviewer),
-      question_count: questionCount,
-      time_duration: Number(duration),
+      interviewerId: Number(selectedInterviewer),
+      questionCount,
+      timeDuration: Number(duration),
       description: description,
-      is_anonymous: isAnonymous,
+      isAnonymous,
     };
 
-    try {
-      if (!interview) {
+    startTransition(async () => {
+      const result = await updateInterview(interviewData, interview.id);
+
+      if (!result.success) {
+        toast.error(result.error, { position: "bottom-right", duration: 3000 });
         return;
       }
-      const response = await InterviewService.updateInterview(interviewData, interview?.id);
-      setIsClicked(false);
-      fetchInterviews();
+
+      router.refresh();
       toast.success("Interview updated successfully.", {
         position: "bottom-right",
         duration: 3000,
       });
-      router.push(`/interviews/${interview?.id}`);
-    } catch (error) {
-      console.error("Error creating interview:", error);
-    }
+      router.push(`/interviews/${interview.id}`);
+    });
   };
 
-  const onDeleteInterviewClick = async () => {
-    if (!interview) {
-      return;
-    }
+  const onDeleteInterviewClick = () => {
+    if (!interview) return;
 
-    try {
-      await InterviewService.deleteInterview(interview.id);
+    startTransition(async () => {
+      const result = await deleteInterview(interview.id);
+
+      if (!result.success) {
+        toast.error("Failed to delete the interview.", {
+          position: "bottom-right",
+          duration: 3000,
+        });
+        return;
+      }
+
       router.push("/dashboard");
-    } catch (error) {
-      console.error("Error deleting interview:", error);
-      toast.error("Failed to delete the interview.", {
-        position: "bottom-right",
-        duration: 3000,
-      });
-    }
+    });
   };
 
   useEffect(() => {
@@ -156,18 +162,15 @@ function EditInterview({ interview }: EditInterviewProps) {
           </p>
           <div className="flex flex-row gap-3">
             <Button
-              disabled={isClicked}
+              disabled={isPending}
               className="bg-indigo-600 hover:bg-indigo-800 mt-2"
-              onClick={() => {
-                setIsClicked(true);
-                onSave();
-              }}
+              onClick={onSave}
             >
               Save <SaveIcon size={16} className="ml-2" />
             </Button>
             <AlertDialog>
               <AlertDialogTrigger>
-                <Button disabled={isClicked} className="bg-red-500 hover:bg-red-600 mr-5 mt-2 p-2">
+                <Button disabled={isPending} className="bg-red-500 hover:bg-red-600 mr-5 mt-2 p-2">
                   <TrashIcon size={16} className="" />
                 </Button>
               </AlertDialogTrigger>

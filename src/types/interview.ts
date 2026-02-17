@@ -1,40 +1,38 @@
 export interface Question {
   id: string;
   question: string;
-  follow_up_count: number;
+  followUpCount: number;
 }
 
 export interface Quote {
   quote: string;
-  call_id: string;
+  callId: string;
 }
 
 export interface InterviewBase {
-  user_id: string;
-  organization_id: string;
+  userId: string;
   name: string;
-  interviewer_id: bigint;
+  interviewerId: bigint;
   objective: string;
-  question_count: number;
-  time_duration: string;
-  is_anonymous: boolean;
+  questionCount: number;
+  timeDuration: string;
+  isAnonymous: boolean;
   questions: Question[];
   description: string;
-  response_count: bigint;
+  responseCount: bigint;
 }
 
 export interface InterviewDetails {
   id: string;
-  created_at: Date;
-  url: string | null;
+  createdAt: Date;
   insights: string[];
   quotes: Quote[];
   details: any;
-  is_active: boolean;
-  theme_color: string;
-  logo_url: string;
+  isActive: boolean;
+  themeColor: string;
+  logoUrl: string;
   respondents: string[];
-  readable_slug: string;
+  readableSlug: string;
 }
 
 export interface Interview extends InterviewBase, InterviewDetails {}

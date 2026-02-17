@@ -3,5 +3,4 @@ export interface User {
   created_at: Date;
   user_id: string;
   image_url: string;
-  organization_id: string;
 }

@@ -1,8 +1,8 @@
 import MiniLoader from "@/components/loaders/mini-loader/miniLoader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { InterviewerService } from "@/services/interviewers.service";
-import { ResponseService } from "@/services/responses.service";
+import { getInterviewer } from "@/services/interviewers.service";
+import { getAllResponses } from "@/services/responses.service";
 import axios from "axios";
 import { ArrowUpRight, Copy } from "lucide-react";
 import { CopyCheck } from "lucide-react";
@@ -14,13 +14,12 @@ interface Props {
   name: string | null;
   interviewerId: bigint;
   id: string;
-  url: string;
   readableSlug: string;
 }
 
 const base_url = process.env.NEXT_PUBLIC_LIVE_URL;
 
-function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
+function InterviewCard({ name, interviewerId, id, readableSlug }: Props) {
   const [copied, setCopied] = useState(false);
   const [responseCount, setResponseCount] = useState<number | null>(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -29,7 +28,7 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const fetchInterviewer = async () => {
-      const interviewer = await InterviewerService.getInterviewer(interviewerId);
+      const interviewer = await getInterviewer(interviewerId);
       setImg(interviewer.image);
     };
     fetchInterviewer();
@@ -40,7 +39,7 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
   useEffect(() => {
     const fetchResponses = async () => {
       try {
-        const responses = await ResponseService.getAllResponses(id);
+        const responses = await getAllResponses(id);
         setResponseCount(responses.length);
         if (responses.length > 0) {
           setIsFetching(true);
@@ -73,9 +72,16 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const buildInterviewUrl = () => {
+    const host = base_url || window.location.host;
+    const protocol = host.includes("localhost") ? "http" : "https";
+    if (readableSlug) return `${protocol}://${host}/call/${readableSlug}`;
+    return `${protocol}://${host}/call/${id}`;
+  };
+
   const copyToClipboard = () => {
     navigator.clipboard
-      .writeText(readableSlug ? `${base_url}/call/${readableSlug}` : (url as string))
+      .writeText(buildInterviewUrl())
       .then(
         () => {
           setCopied(true);
@@ -96,8 +102,7 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
   const handleJumpToInterview = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
-    const interviewUrl = readableSlug ? `/call/${readableSlug}` : `/call/${url}`;
-    window.open(interviewUrl, "_blank");
+    window.open(buildInterviewUrl(), "_blank");
   };
 
   return (
@@ -122,13 +127,15 @@ function InterviewCard({ name, interviewerId, id, url, readableSlug }: Props) {
           </div>
           <div className="flex flex-row items-center mx-4 ">
             <div className="w-full overflow-hidden">
-              <Image
-                src={img}
-                alt="Picture of the interviewer"
-                width={70}
-                height={70}
-                className="object-cover object-center"
-              />
+              {img && (
+                <Image
+                  src={img}
+                  alt="Picture of the interviewer"
+                  width={70}
+                  height={70}
+                  className="object-cover object-center"
+                />
+              )}
             </div>
             <div className="text-black text-sm font-semibold mt-2 mr-2 whitespace-nowrap">
               Responses: <span className="font-normal">{responseCount?.toString() || 0}</span>

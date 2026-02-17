@@ -50,7 +50,7 @@ export function FeedbackForm({ onSubmit, email }: FeedbackFormProps) {
         onChange={(e) => setFeedback(e.target.value)}
       />
       <Button
-        disabled={satisfaction === null && feedback.trim() === ""}
+        disabled={satisfaction === null || feedback.trim() === ""}
         className="w-full bg-indigo-600 text-white"
         onClick={handleSubmit}
       >

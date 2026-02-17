@@ -3,7 +3,7 @@
 import DataTable, { type TableData } from "@/components/dashboard/interview/dataTable";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useInterviewers } from "@/contexts/interviewers.context";
+import { getAllInterviewers } from "@/services/interviewers.service";
 import { CandidateStatus } from "@/lib/enum";
 import { convertSecondstoMMSS } from "@/lib/utils";
 import type { Interview } from "@/types/interview";
@@ -38,8 +38,12 @@ function InfoTooltip({ content }: { content: string }) {
 }
 
 function SummaryInfo({ responses, interview }: SummaryProps) {
-  const { interviewers } = useInterviewers();
+  const [interviewers, setInterviewers] = useState<Interviewer[]>([]);
   const [interviewer, setInterviewer] = useState<Interviewer>();
+
+  useEffect(() => {
+    getAllInterviewers().then((data) => setInterviewers(data as Interviewer[]));
+  }, []);
   const [totalDuration, setTotalDuration] = useState<number>(0);
   const [completedInterviews, setCompletedInterviews] = useState<number>(0);
   const [sentimentCount, setSentimentCount] = useState({
@@ -82,7 +86,7 @@ function SummaryInfo({ responses, interview }: SummaryProps) {
       return;
     }
     const interviewer = interviewers.find(
-      (interviewer) => interviewer.id === interview.interviewer_id,
+      (interviewer) => interviewer.id === interview.interviewerId,
     );
     setInterviewer(interviewer);
   }, [interviewers, interview]);
