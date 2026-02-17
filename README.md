@@ -70,6 +70,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 | Variable | Description |
 |---|---|
+| `NEXT_PUBLIC_SITE_URL` | Base URL of your app (e.g. `http://localhost:3000`) — used for metadata |
 | `BETTER_AUTH_SECRET` | Random secret — generate with `openssl rand -base64 32` |
 | `BETTER_AUTH_URL` | Base URL of your app (e.g. `http://localhost:3000`) |
 | `DATABASE_URL` | Postgres connection string |

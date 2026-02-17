@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: "OpenHire",
   description: "AI powered Interviews",
+  icons: {
+    icon: "/browser-user-icon.ico",
+  },
   openGraph: {
     title: "OpenHire",
     description: "AI-powered Interviews",
@@ -26,16 +29,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
-      <head>
-        <link rel="icon" href="/browser-user-icon.ico" />
-      </head>
       <body className={inter.className}>
         <Providers>
           {children}
