@@ -57,10 +57,7 @@ export async function POST(req: Request) {
     const content = basePromptOutput.message?.content || "";
     const insightsResponse = JSON.parse(content);
 
-    await updateInterview(
-      { insights: insightsResponse.insights },
-      body.interviewId,
-    );
+    await updateInterview({ insights: insightsResponse.insights }, body.interviewId);
 
     logger.info("Insights generated successfully");
 

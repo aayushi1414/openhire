@@ -41,11 +41,9 @@ export default function InterviewersClient({ interviewers }: InterviewersClientP
             className=" h-44 pt-2 overflow-x-scroll scroll whitespace-nowrap scroll-smooth scrollbar-hide w-[40rem]"
           >
             {interviewers.length === 0 ? <CreateInterviewerButton /> : <></>}
-            <>
-              {interviewers.map((interviewer) => (
-                <InterviewerCard key={interviewer.id} interviewer={interviewer} />
-              ))}
-            </>
+            {interviewers.map((interviewer) => (
+              <InterviewerCard key={interviewer.id} interviewer={interviewer} />
+            ))}
           </div>
           {interviewers.length > 4 ? (
             <div className="flex-row justify-center items-center space-y-10">

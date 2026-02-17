@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { interview } from "@/lib/db/schema";
-import { eq, or, desc } from "drizzle-orm";
+import { desc, eq, or } from "drizzle-orm";
 
 export const getAllInterviews = async (userId: string) => {
   try {

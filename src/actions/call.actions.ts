@@ -9,10 +9,7 @@ const retellClient = new Retell({
   apiKey: process.env.RETELL_API_KEY || "",
 });
 
-export const registerCall = async (
-  interviewerId: number,
-  dynamicData: Record<string, any>,
-) => {
+export const registerCall = async (interviewerId: number, dynamicData: Record<string, any>) => {
   if (!process.env.RETELL_API_KEY) {
     console.error("Missing required environment variable: RETELL_API_KEY");
     return { success: false as const, error: "Retell API key is not configured" };

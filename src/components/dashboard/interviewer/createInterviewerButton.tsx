@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { createDefaultInterviewers } from "@/actions/interviewers.actions";
+import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";

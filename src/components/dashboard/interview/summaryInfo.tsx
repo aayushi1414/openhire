@@ -3,16 +3,16 @@
 import DataTable, { type TableData } from "@/components/dashboard/interview/dataTable";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { getAllInterviewers } from "@/services/interviewers.service";
 import { CandidateStatus } from "@/lib/enum";
 import { convertSecondstoMMSS } from "@/lib/utils";
+import { getAllInterviewers } from "@/services/interviewers.service";
 import type { Interview } from "@/types/interview";
 import type { Interviewer } from "@/types/interviewer";
 import type { Response } from "@/types/response";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { Info, SmileIcon, UserCircleIcon } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 type SummaryProps = {
   responses: Response[];

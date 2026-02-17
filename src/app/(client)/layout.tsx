@@ -4,12 +4,12 @@ import "../globals.css";
 import Navbar from "@/components/navbar";
 import Providers from "@/components/providers";
 import SideMenu from "@/components/sideMenu";
+import { useSession } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 import { Inter } from "next/font/google";
 import { usePathname, useRouter } from "next/navigation";
-import { Toaster } from "sonner";
-import { useSession } from "@/lib/auth/client";
 import { useEffect } from "react";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 

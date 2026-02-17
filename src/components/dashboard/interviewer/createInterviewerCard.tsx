@@ -4,14 +4,12 @@ import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
-import { createInterviewer } from "@/services/interviewers.service";
 import { useSession } from "@/lib/auth/client";
-import { useRouter } from "next/navigation";
+import { createInterviewer } from "@/services/interviewers.service";
 import { Image as LucideImage } from "lucide-react";
 import { Plus } from "lucide-react";
 import Image from "next/image";
-/* eslint-disable react-hooks/rules-of-hooks */
-import React from "react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const createInterviewerCard = () => {

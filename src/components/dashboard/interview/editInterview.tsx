@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteInterview, updateInterview } from "@/actions/interviews.actions";
 import QuestionCard from "@/components/dashboard/interview/create-popup/questionCard";
 import {
   AlertDialog,
@@ -16,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { getAllInterviewers } from "@/services/interviewers.service";
-import { updateInterview, deleteInterview } from "@/actions/interviews.actions";
 import type { Interview, Question } from "@/types/interview";
 import type { Interviewer } from "@/types/interviewer";
 import { Plus, SaveIcon, TrashIcon } from "lucide-react";
@@ -84,7 +84,9 @@ function EditInterview({ interview }: EditInterviewProps) {
   };
 
   const onSave = () => {
-    if (!interview) return;
+    if (!interview) {
+      return;
+    }
 
     const questionCount = questions.length < numQuestions ? questions.length : numQuestions;
 
@@ -116,7 +118,9 @@ function EditInterview({ interview }: EditInterviewProps) {
   };
 
   const onDeleteInterviewClick = () => {
-    if (!interview) return;
+    if (!interview) {
+      return;
+    }
 
     startTransition(async () => {
       const result = await deleteInterview(interview.id);

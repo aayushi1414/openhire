@@ -17,9 +17,9 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { getInterviewById } from "@/services/interviews.service";
 import { CandidateStatus } from "@/lib/enum";
 import { formatTimestampToDateHHMM } from "@/lib/utils";
+import { getInterviewById } from "@/services/interviews.service";
 import { updateInterview } from "@/services/interviews.service";
 import { getAllResponses, saveResponse } from "@/services/responses.service";
 import type { Interview } from "@/types/interview";
@@ -68,7 +68,9 @@ function InterviewHome({ params, searchParams }: Props) {
 
   useEffect(() => {
     const fetchInterview = async () => {
-      if (isGeneratingInsights) return;
+      if (isGeneratingInsights) {
+        return;
+      }
       try {
         const response = await getInterviewById(resolvedParams.interviewId);
         setInterview(response);
@@ -84,7 +86,7 @@ function InterviewHome({ params, searchParams }: Props) {
       }
     };
     fetchInterview();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedParams.interviewId, isGeneratingInsights]);
 
   useEffect(() => {
@@ -132,10 +134,7 @@ function InterviewHome({ params, searchParams }: Props) {
       const updatedIsActive = !isActive;
       setIsActive(updatedIsActive);
 
-      await updateInterview(
-        { isActive: updatedIsActive },
-        resolvedParams.interviewId,
-      );
+      await updateInterview({ isActive: updatedIsActive }, resolvedParams.interviewId);
 
       toast.success("Interview status updated", {
         description: `The interview is now ${updatedIsActive ? "active" : "inactive"}.`,

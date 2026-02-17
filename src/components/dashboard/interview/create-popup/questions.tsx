@@ -1,15 +1,15 @@
+import { createInterview } from "@/actions/interviews.actions";
 import QuestionCard from "@/components/dashboard/interview/create-popup/questionCard";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { InterviewBase, Question } from "@/types/interview";
 import { useSession } from "@/lib/auth/client";
-import { createInterview } from "@/actions/interviews.actions";
+import type { InterviewBase, Question } from "@/types/interview";
 import { Plus } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
-import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from "uuid";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   interviewData: InterviewBase;

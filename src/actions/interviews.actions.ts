@@ -2,8 +2,8 @@
 
 import {
   createInterview as createInterviewService,
-  updateInterview as updateInterviewService,
   deleteInterview as deleteInterviewService,
+  updateInterview as updateInterviewService,
 } from "@/services/interviews.service";
 import { nanoid } from "nanoid";
 

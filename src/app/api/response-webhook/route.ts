@@ -17,13 +17,7 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const body = JSON.parse(rawBody);
 
-  if (
-    !Retell.verify(
-      rawBody,
-      apiKey,
-      req.headers.get("x-retell-signature") as string,
-    )
-  ) {
+  if (!Retell.verify(rawBody, apiKey, req.headers.get("x-retell-signature") as string)) {
     console.error("Invalid signature");
 
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
