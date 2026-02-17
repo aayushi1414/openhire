@@ -74,7 +74,9 @@ module.exports = {
   },
   plugins: [
     require("tailwindcss-animate"),
-    function ({ addUtilities }: { addUtilities: (utilities: Record<string, Record<string, string>>) => void }) {
+    ({
+      addUtilities,
+    }: { addUtilities: (utilities: Record<string, Record<string, string>>) => void }) => {
       addUtilities({
         ".scrollbar-hide": {
           "-ms-overflow-style": "none",

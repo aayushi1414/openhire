@@ -1,5 +1,6 @@
 "use client";
 
+import { registerCall } from "@/actions/call.actions";
 import { FeedbackForm } from "@/components/call/feedbackForm";
 import {
   AlertDialog,
@@ -18,7 +19,6 @@ import { getInterviewer } from "@/services/interviewers.service";
 import { createResponse, getAllEmails, saveResponse } from "@/services/responses.service";
 import type { Interview } from "@/types/interview";
 import type { FeedbackData } from "@/types/response";
-import { registerCall } from "@/actions/call.actions";
 import { AlarmClockIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
@@ -34,7 +34,6 @@ const webClient = new RetellWebClient();
 type InterviewProps = {
   interview: Interview;
 };
-
 
 type transcriptType = {
   role: string;
@@ -185,7 +184,7 @@ function Call({ interview }: InterviewProps) {
     setLoading(true);
 
     const oldUserEmails: string[] = (await getAllEmails(interview.id)).map(
-      (item) => item.email,
+      (item: any) => item.email,
     );
     const OldUser =
       oldUserEmails.includes(email) ||
@@ -194,10 +193,7 @@ function Call({ interview }: InterviewProps) {
     if (OldUser) {
       setIsOldUser(true);
     } else {
-      const result = await registerCall(
-        Number(interview?.interviewerId),
-        data,
-      );
+      const result = await registerCall(Number(interview?.interviewerId), data);
 
       if (!result.success) {
         console.error("Failed to register call:", result.error);
@@ -208,9 +204,7 @@ function Call({ interview }: InterviewProps) {
       const { call_id, access_token } = result.data;
 
       if (access_token) {
-        await webClient
-          .startCall({ accessToken: access_token })
-          .catch(console.error);
+        await webClient.startCall({ accessToken: access_token }).catch(console.error);
         setIsCalling(true);
         setIsStarted(true);
         setCallId(call_id);
@@ -248,10 +242,7 @@ function Call({ interview }: InterviewProps) {
   useEffect(() => {
     if (isEnded) {
       const updateInterview = async () => {
-        await saveResponse(
-          { isEnded: true, tabSwitchCount: tabSwitchCount },
-          callId,
-        );
+        await saveResponse({ isEnded: true, tabSwitchCount: tabSwitchCount }, callId);
       };
 
       updateInterview();

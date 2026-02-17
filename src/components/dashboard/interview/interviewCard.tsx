@@ -75,28 +75,28 @@ function InterviewCard({ name, interviewerId, id, readableSlug }: Props) {
   const buildInterviewUrl = () => {
     const host = base_url || window.location.host;
     const protocol = host.includes("localhost") ? "http" : "https";
-    if (readableSlug) return `${protocol}://${host}/call/${readableSlug}`;
+    if (readableSlug) {
+      return `${protocol}://${host}/call/${readableSlug}`;
+    }
     return `${protocol}://${host}/call/${id}`;
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard
-      .writeText(buildInterviewUrl())
-      .then(
-        () => {
-          setCopied(true);
-          toast.success("The link to your interview has been copied to your clipboard.", {
-            position: "bottom-right",
-            duration: 3000,
-          });
-          setTimeout(() => {
-            setCopied(false);
-          }, 2000);
-        },
-        (err) => {
-          console.log("failed to copy", err.mesage);
-        },
-      );
+    navigator.clipboard.writeText(buildInterviewUrl()).then(
+      () => {
+        setCopied(true);
+        toast.success("The link to your interview has been copied to your clipboard.", {
+          position: "bottom-right",
+          duration: 3000,
+        });
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      },
+      (err) => {
+        console.log("failed to copy", err.mesage);
+      },
+    );
   };
 
   const handleJumpToInterview = (event: React.MouseEvent) => {

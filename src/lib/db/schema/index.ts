@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  text,
-  integer,
-  boolean,
-  timestamp,
-  serial,
-  jsonb,
-} from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 export * from "./auth";
 import { user } from "./auth";

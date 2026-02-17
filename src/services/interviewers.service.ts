@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { interviewer } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export const getAllInterviewers = async (clientId = "") => {
   try {
@@ -50,4 +50,3 @@ export const getInterviewer = async (interviewerId: number | bigint) => {
     return null;
   }
 };
-

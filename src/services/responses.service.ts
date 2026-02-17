@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { response } from "@/lib/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export const createResponse = async (payload: any) => {
   try {
@@ -33,12 +33,7 @@ export const getAllResponses = async (interviewId: string) => {
     const data = await db
       .select()
       .from(response)
-      .where(
-        and(
-          eq(response.interviewId, interviewId),
-          eq(response.isEnded, true),
-        ),
-      )
+      .where(and(eq(response.interviewId, interviewId), eq(response.isEnded, true)))
       .orderBy(desc(response.createdAt));
 
     return data || [];
@@ -64,10 +59,7 @@ export const getAllEmails = async (interviewId: string) => {
 
 export const getResponseByCallId = async (id: string) => {
   try {
-    const data = await db
-      .select()
-      .from(response)
-      .where(eq(response.callId, id));
+    const data = await db.select().from(response).where(eq(response.callId, id));
 
     return data ? data[0] : null;
   } catch (error) {

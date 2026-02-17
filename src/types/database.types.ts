@@ -1,11 +1,5 @@
-import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
-import type {
-  user,
-  interviewer,
-  interview,
-  response,
-  feedback,
-} from "@/lib/db/schema";
+import type { feedback, interview, interviewer, response, user } from "@/lib/db/schema";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
 export type UserRow = InferSelectModel<typeof user>;
 export type InterviewerRow = InferSelectModel<typeof interviewer>;

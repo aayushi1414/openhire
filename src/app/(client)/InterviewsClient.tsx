@@ -76,8 +76,8 @@ export default function InterviewsClient({ interviews, currentPlan }: Interviews
                   </div>
                 </div>
                 <p className="text-l text-center">
-                  Contact <span className="font-semibold">founders@openhire.io</span> to upgrade your
-                  plan.
+                  Contact <span className="font-semibold">founders@openhire.io</span> to upgrade
+                  your plan.
                 </p>
               </div>
             </Modal>

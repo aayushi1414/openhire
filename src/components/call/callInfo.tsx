@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CandidateStatus } from "@/lib/enum";
-import { getResponseByCallId, deleteResponse, updateResponse } from "@/services/responses.service";
+import { deleteResponse, getResponseByCallId, updateResponse } from "@/services/responses.service";
 import type { Analytics, CallData } from "@/types/response";
 import { CircularProgress } from "@nextui-org/react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
@@ -198,10 +198,7 @@ function CallInfo({ call_id, onDeleteResponse, onCandidateStatusChange }: CallPr
                       value={candidateStatus}
                       onValueChange={async (newValue: string) => {
                         setCandidateStatus(newValue);
-                        await updateResponse(
-                          { candidate_status: newValue },
-                          call_id,
-                        );
+                        await updateResponse({ candidate_status: newValue }, call_id);
                         onCandidateStatusChange(call_id, newValue);
                       }}
                     >

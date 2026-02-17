@@ -1,8 +1,8 @@
 "use server";
 
-import type { FeedbackData } from "@/types/response";
 import { db } from "@/lib/db";
 import { feedback } from "@/lib/db/schema";
+import type { FeedbackData } from "@/types/response";
 
 export const submitFeedback = async (feedbackData: FeedbackData) => {
   const [created] = await db
