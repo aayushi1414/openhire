@@ -60,6 +60,7 @@ function CircularProgress({
   return (
     <div className="relative w-28 h-28 flex items-center justify-center">
       <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100" fill="none">
+        <title>Progress Circle</title>
         <circle cx="50" cy="50" r={radius} stroke="#4f46e51a" strokeWidth="8" />
         <circle
           cx="50"
