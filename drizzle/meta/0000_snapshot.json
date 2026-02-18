@@ -52,12 +52,8 @@
           "name": "feedback_interview_id_interview_id_fk",
           "tableFrom": "feedback",
           "tableTo": "interview",
-          "columnsFrom": [
-            "interview_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["interview_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -203,12 +199,8 @@
           "name": "interview_user_id_user_id_fk",
           "tableFrom": "interview",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -216,12 +208,8 @@
           "name": "interview_interviewer_id_interviewer_id_fk",
           "tableFrom": "interview",
           "tableTo": "interviewer",
-          "columnsFrom": [
-            "interviewer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["interviewer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -411,12 +399,8 @@
           "name": "response_interview_id_interview_id_fk",
           "tableFrom": "response",
           "tableTo": "interview",
-          "columnsFrom": [
-            "interview_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["interview_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -533,12 +517,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -625,12 +605,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -640,9 +616,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -706,9 +680,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -787,11 +759,7 @@
     "public.plan": {
       "name": "plan",
       "schema": "public",
-      "values": [
-        "free",
-        "pro",
-        "free_trial_over"
-      ]
+      "values": ["free", "pro", "free_trial_over"]
     }
   },
   "schemas": {},
