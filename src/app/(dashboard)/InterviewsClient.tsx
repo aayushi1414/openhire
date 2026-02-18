@@ -16,7 +16,6 @@ type InterviewsClientProps = {
 
 export default function InterviewsClient({ interviews, currentPlan }: InterviewsClientProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(currentPlan === "free_trial_over");
-  console.log(interviews);
 
   return (
     <main className="p-8 pt-0 ml-12 mr-auto rounded-md">

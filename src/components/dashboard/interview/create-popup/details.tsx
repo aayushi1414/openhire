@@ -11,7 +11,6 @@ import axios from "axios";
 import { ChevronLeft, ChevronRight, Info } from "lucide-react";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
 import FileUpload from "../fileUpload";
 
 interface Props {
@@ -80,7 +79,7 @@ function DetailsPopup({
     const generatedQuestionsResponse = JSON.parse(generatedQuestions?.data?.response);
 
     const updatedQuestions = generatedQuestionsResponse.questions.map((question: Question) => ({
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       question: question.question.trim(),
       followUpCount: 1,
     }));
@@ -106,7 +105,7 @@ function DetailsPopup({
       ...interviewData,
       name: name.trim(),
       objective: objective.trim(),
-      questions: [{ id: uuidv4(), question: "", followUpCount: 1 }],
+      questions: [{ id: crypto.randomUUID(), question: "", followUpCount: 1 }],
       interviewerId: selectedInterviewer,
       questionCount: Number(numQuestions),
       timeDuration: String(duration),

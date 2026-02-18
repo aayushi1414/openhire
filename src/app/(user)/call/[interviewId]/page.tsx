@@ -1,5 +1,6 @@
 import Call from "@/components/call";
 import { getInterviewById } from "@/services/interviews.service";
+import type { Metadata } from "next";
 import Image from "next/image";
 
 type Props = {
@@ -7,6 +8,15 @@ type Props = {
     interviewId: string;
   }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { interviewId } = await params;
+  const interview = await getInterviewById(interviewId);
+
+  return {
+    title: interview?.name ?? "OpenHire Client",
+  };
+}
 
 function PopUpMessage({
   title,
