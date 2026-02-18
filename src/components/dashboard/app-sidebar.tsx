@@ -78,8 +78,8 @@ export default function AppSidebar() {
         <div className="rounded-md p-2">
           <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center">
             <div className="group-data-[collapsible=icon]:hidden">
-              <p className="text-sm">{session?.user.name}</p>
-              <p className="text-muted-foreground text-sm">{session?.user.email}</p>
+              <p className="text-sm truncate">{session?.user.name}</p>
+              <p className="text-muted-foreground text-sm truncate">{session?.user.email}</p>
             </div>
             <Button variant="ghost" onClick={handleLogout} size="icon">
               <LogOut className="cursor-pointer text-muted-foreground" size={16} />
