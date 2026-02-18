@@ -73,6 +73,7 @@ function InterviewHome({ params, searchParams }: Props) {
       }
       try {
         const response = await getInterviewById(resolvedParams.interviewId);
+        console.log(response);
         setInterview(response);
         setIsActive(response.isActive);
         setIsViewed(response.is_viewed);
@@ -107,7 +108,7 @@ function InterviewHome({ params, searchParams }: Props) {
 
   const handleDeleteResponse = (deletedCallId: string) => {
     if (responses) {
-      setResponses(responses.filter((response) => response.call_id !== deletedCallId));
+      setResponses(responses.filter((response) => response.callId !== deletedCallId));
       if (resolvedSearchParams.call === deletedCallId) {
         router.push(`/interviews/${resolvedParams.interviewId}`);
       }
@@ -116,10 +117,10 @@ function InterviewHome({ params, searchParams }: Props) {
 
   const handleResponseClick = async (response: Response) => {
     try {
-      await saveResponse({ isViewed: true }, response.call_id);
+      await saveResponse({ isViewed: true }, response.callId);
       if (responses) {
         const updatedResponses = responses.map((r) =>
-          r.call_id === response.call_id ? { ...r, is_viewed: true } : r,
+          r.callId === response.callId ? { ...r, is_viewed: true } : r,
         );
         setResponses(updatedResponses);
       }
@@ -170,7 +171,7 @@ function InterviewHome({ params, searchParams }: Props) {
   const handleCandidateStatusChange = (callId: string, newStatus: string) => {
     setResponses((prevResponses) => {
       return prevResponses?.map((response) =>
-        response.call_id === callId ? { ...response, candidate_status: newStatus } : response,
+        response.callId === callId ? { ...response, candidate_status: newStatus } : response,
       );
     });
   };
@@ -363,14 +364,14 @@ function InterviewHome({ params, searchParams }: Props) {
                     <button
                       type="button"
                       className={`p-2 rounded-md hover:bg-indigo-100 border-2 my-1 text-left text-xs ${
-                        resolvedSearchParams.call === response.call_id
+                        resolvedSearchParams.call === response.callId
                           ? "bg-indigo-200"
                           : "border-indigo-100"
                       } flex flex-row justify-between cursor-pointer w-full`}
                       key={response?.id}
                       onClick={() => {
                         router.push(
-                          `/interviews/${resolvedParams.interviewId}?call=${response.call_id}`,
+                          `/interviews/${resolvedParams.interviewId}?call=${response.callId}`,
                         );
                         handleResponseClick(response);
                       }}
@@ -391,7 +392,7 @@ function InterviewHome({ params, searchParams }: Props) {
                               {response?.name ? `${response?.name}'s Response` : "Anonymous"}
                             </p>
                             <p className="">
-                              {formatTimestampToDateHHMM(String(response?.created_at))}
+                              {formatTimestampToDateHHMM(String(response?.createdAt))}
                             </p>
                           </div>
                           <div className="flex flex-col items-center justify-center ml-auto flex-shrink-0">

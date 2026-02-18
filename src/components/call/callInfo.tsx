@@ -26,16 +26,60 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CandidateStatus } from "@/lib/enum";
 import { deleteResponse, getResponseByCallId, updateResponse } from "@/services/responses.service";
 import type { Analytics, CallData } from "@/types/response";
-import { CircularProgress } from "@nextui-org/react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import axios from "axios";
 import { DownloadIcon, TrashIcon } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { marked } from "marked";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import ReactAudioPlayer from "react-audio-player";
 import { toast } from "sonner";
+
+type CircularProgressProps = {
+  value?: number;
+  maxValue?: number;
+  minValue?: number;
+  showValueLabel?: boolean;
+  valueLabel?: React.ReactNode;
+  classNames?: Record<string, string>;
+};
+
+function CircularProgress({
+  value = 0,
+  maxValue = 100,
+  minValue = 0,
+  showValueLabel,
+  valueLabel,
+}: CircularProgressProps) {
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const pct = ((value - minValue) / (maxValue - minValue)) * 100;
+  const offset = circumference - (pct / 100) * circumference;
+  return (
+    <div className="relative w-28 h-28 flex items-center justify-center">
+      <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r={radius} stroke="#4f46e51a" strokeWidth="8" />
+        <circle
+          cx="50"
+          cy="50"
+          r={radius}
+          stroke="#4f46e5"
+          strokeWidth="8"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      {showValueLabel && (
+        <span className="absolute text-3xl font-semibold text-indigo-600">
+          {valueLabel ?? `${Math.round(pct)}%`}
+        </span>
+      )}
+    </div>
+  );
+}
 
 type CallProps = {
   call_id: string;
@@ -149,6 +193,8 @@ function CallInfo({ call_id, onDeleteResponse, onCandidateStatusChange }: CallPr
       });
     }
   };
+
+  console.log({ analytics });
 
   return (
     <div className="h-screen z-[10] mx-2 mb-[100px] overflow-y-scroll">
@@ -290,18 +336,7 @@ function CallInfo({ call_id, onDeleteResponse, onCandidateStatusChange }: CallPr
               {analytics?.overallScore !== undefined && (
                 <div className="flex flex-col gap-3 text-sm p-4 rounded-2xl bg-slate-50">
                   <div className="flex flex-row gap-2 align-middle">
-                    <CircularProgress
-                      classNames={{
-                        svg: "w-28 h-28 drop-shadow-md",
-                        indicator: "stroke-indigo-600",
-                        track: "stroke-indigo-600/10",
-                        value: "text-3xl font-semibold text-indigo-600",
-                      }}
-                      value={analytics?.overallScore}
-                      strokeWidth={4}
-                      showValueLabel={true}
-                      formatOptions={{ signDisplay: "never" }}
-                    />
+                    <CircularProgress value={analytics?.overallScore} showValueLabel={true} />
                     <p className="font-medium my-auto text-xl">Overall Hiring Score</p>
                   </div>
                   <div className="">
@@ -320,16 +355,9 @@ function CallInfo({ call_id, onDeleteResponse, onCandidateStatusChange }: CallPr
                 <div className="flex flex-col gap-3 text-sm p-4 rounded-2xl bg-slate-50">
                   <div className="flex flex-row gap-2 align-middle">
                     <CircularProgress
-                      classNames={{
-                        svg: "w-28 h-28 drop-shadow-md",
-                        indicator: "stroke-indigo-600",
-                        track: "stroke-indigo-600/10",
-                        value: "text-3xl font-semibold text-indigo-600",
-                      }}
                       value={analytics?.communication.score}
                       maxValue={10}
                       minValue={0}
-                      strokeWidth={4}
                       showValueLabel={true}
                       valueLabel={
                         <div className="flex items-baseline">
@@ -337,7 +365,6 @@ function CallInfo({ call_id, onDeleteResponse, onCandidateStatusChange }: CallPr
                           <span className="text-xl ml-0.5">/10</span>
                         </div>
                       }
-                      formatOptions={{ signDisplay: "never" }}
                     />
                     <p className="font-medium my-auto text-xl">Communication</p>
                   </div>
