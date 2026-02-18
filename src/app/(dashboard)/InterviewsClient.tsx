@@ -18,9 +18,9 @@ export default function InterviewsClient({ interviews, currentPlan }: Interviews
   const [isModalOpen, setIsModalOpen] = useState<boolean>(currentPlan === "free_trial_over");
 
   return (
-    <main className="p-8 pt-0 ml-12 mr-auto rounded-md">
+    <main>
       <div className="flex flex-col items-left">
-        <h2 className="mr-2 text-2xl font-semibold tracking-tight mt-8">My Interviews</h2>
+        <h2 className="mr-2 text-2xl font-semibold tracking-tight">My Interviews</h2>
         <h3 className=" text-sm tracking-tight text-gray-600 font-medium ">
           Start getting responses now!
         </h3>
