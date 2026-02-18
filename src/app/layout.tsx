@@ -1,11 +1,10 @@
-import "../globals.css";
-import Navbar from "@/components/navbar";
-import Providers from "@/components/providers";
-import SideMenu from "@/components/sideMenu";
-import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import type { ReactNode } from "react";
 import { Toaster } from "sonner";
+import "./globals.css";
+import Providers from "@/components/providers";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL as string;
@@ -36,14 +35,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
-      <body className={cn(inter.className, "antialiased overflow-hidden min-h-screen")}>
+      <body className={cn(inter.className, "antialiased min-h-screen")}>
         <Providers>
-          <Navbar />
-          <div className="flex flex-row h-screen">
-            <SideMenu />
-            <div className="ml-[200px] pt-[64px] h-full overflow-y-auto flex-grow">{children}</div>
-          </div>
-
+          {children}
           <Toaster
             toastOptions={{
               classNames: {

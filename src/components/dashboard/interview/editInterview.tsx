@@ -132,7 +132,7 @@ function EditInterview({ interview }: EditInterviewProps) {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/");
     });
   };
 
