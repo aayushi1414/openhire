@@ -1,12 +1,12 @@
 export interface Response {
   id: bigint;
-  created_at: Date;
+  createdAt: Date;
   name: string | null;
-  interview_id: string;
+  interviewerId: string;
   duration: number;
-  call_id: string;
+  callId: string;
   details: any;
-  is_analysed: boolean;
+  isAnalysed: boolean;
   email: string;
   is_ended: boolean;
   is_viewed: boolean;
