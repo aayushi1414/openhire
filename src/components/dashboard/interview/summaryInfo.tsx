@@ -70,7 +70,7 @@ function SummaryInfo({ responses, interview }: SummaryProps) {
 
   const prepareTableData = (responses: Response[]): TableData[] => {
     return responses.map((response) => ({
-      call_id: response.call_id,
+      call_id: response.callId,
       name: response.name || "Anonymous",
       overallScore: response.analytics?.overallScore || 0,
       communicationScore: response.analytics?.communication?.score || 0,

@@ -44,10 +44,10 @@ function InterviewCard({ name, interviewerId, id, readableSlug }: Props) {
         if (responses.length > 0) {
           setIsFetching(true);
           for (const response of responses) {
-            if (!response.is_analysed) {
+            if (!response.isAnalysed) {
               try {
                 const result = await axios.post("/api/get-call", {
-                  id: response.call_id,
+                  id: response.callId,
                 });
 
                 if (result.status !== 200) {
