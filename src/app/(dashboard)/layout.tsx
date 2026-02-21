@@ -13,7 +13,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="flex-1 overflow-hidden px-3 py-3 md:px-10">
+      <main className="flex-1 overflow-hidden p-6">
         {/* Mobile menu trigger - only visible on mobile */}
         <div className="mb-4 md:hidden">
           <SidebarTrigger />

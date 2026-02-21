@@ -12,20 +12,19 @@ export interface Quote {
 export interface InterviewBase {
   userId: string;
   name: string;
-  interviewerId: bigint;
+  interviewerId: number;
   objective: string;
   questionCount: number;
   timeDuration: string;
   isAnonymous: boolean;
   questions: Question[];
   description: string;
-  responseCount: bigint;
+  responseCount: number;
 }
 
 export interface InterviewDetails {
   id: string;
   createdAt: Date;
-  insights: string[];
   quotes: Quote[];
   details: any;
   isActive: boolean;

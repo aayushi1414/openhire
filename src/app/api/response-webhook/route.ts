@@ -1,6 +1,6 @@
-import { analyzeCall } from "@/actions/call.actions";
 import { type NextRequest, NextResponse } from "next/server";
 import { Retell } from "retell-sdk";
+import { analyzeCall } from "@/actions/call";
 
 const apiKey = process.env.RETELL_API_KEY || "";
 

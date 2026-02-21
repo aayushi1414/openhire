@@ -1,10 +1,10 @@
-import { logger } from "@/lib/logger";
-import {
-  SYSTEM_PROMPT,
-  getCommunicationAnalysisPrompt,
-} from "@/lib/prompts/communication-analysis";
 import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
+import { logger } from "@/lib/logger";
+import {
+  getCommunicationAnalysisPrompt,
+  SYSTEM_PROMPT,
+} from "@/lib/prompts/communication-analysis";
 
 export async function POST(req: Request) {
   logger.info("analyze-communication request received");

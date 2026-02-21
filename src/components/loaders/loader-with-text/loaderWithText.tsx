@@ -10,12 +10,18 @@ function LoaderWithText() {
         aria-label="Loading"
       >
         <title>Loading</title>
-        <circle cx="50" cy="50" r="45" stroke="#c7d2fe" strokeWidth="8" />
         <circle
           cx="50"
           cy="50"
           r="45"
-          stroke="#4f46e5"
+          stroke="oklch(from var(--primary) l c h / 0.25)"
+          strokeWidth="8"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          stroke="var(--primary)"
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray="283"

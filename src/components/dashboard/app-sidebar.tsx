@@ -12,7 +12,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { signOut, useSession } from "@/lib/auth/client";
-import { LogOut, PlayCircleIcon, Users } from "lucide-react";
+import { LogOut, PlayCircleIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -50,22 +50,14 @@ export default function AppSidebar() {
         <SidebarGroup>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname === "/"} tooltip="Interviews">
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === "/" || pathname.startsWith("/interviews")}
+                tooltip="Interviews"
+              >
                 <Link href="/">
                   <PlayCircleIcon />
                   <span>Interviews</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === "/interviewers"}
-                tooltip="Interviewers"
-              >
-                <Link href="/interviewers">
-                  <Users />
-                  <span>Interviewers</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -81,7 +73,7 @@ export default function AppSidebar() {
               <p className="text-sm">{session?.user.name}</p>
               <p className="text-muted-foreground text-sm">{session?.user.email}</p>
             </div>
-            <Button variant="ghost" onClick={handleLogout} size="icon">
+            <Button variant="ghost" onClick={handleLogout} size="icon" aria-label="Log out">
               <LogOut className="cursor-pointer text-muted-foreground" size={16} />
             </Button>
           </div>

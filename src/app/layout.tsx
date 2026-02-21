@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 import "./globals.css";
 import Providers from "@/components/providers";
@@ -38,18 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className={cn(inter.className, "antialiased min-h-screen")}>
         <Providers>
           {children}
-          <Toaster
-            toastOptions={{
-              classNames: {
-                toast: "bg-white",
-                title: "text-black",
-                description: "text-red-400",
-                actionButton: "bg-indigo-400",
-                cancelButton: "bg-orange-400",
-                closeButton: "bg-white-400",
-              },
-            }}
-          />
+          <Toaster />
         </Providers>
       </body>
     </html>

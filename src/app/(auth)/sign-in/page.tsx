@@ -18,7 +18,7 @@ const formSchema = z.object({
   email: z.email("Invalid email address").nonempty("Email is required"),
   password: z
     .string()
-    .min(8, "Password must be at least 10 characters long")
+    .min(8, "Password must be at least 8 characters long")
     .regex(
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^*])[A-Za-z\d!@#$%^*]+$/,
       "Password must contain at least one letter, one number, and one special character",
@@ -28,8 +28,7 @@ const formSchema = z.object({
 export default function SignInPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    mode: "onChange",
-    reValidateMode: "onChange",
+    mode: "onTouched",
     defaultValues: {
       email: "",
       password: "",
@@ -39,7 +38,7 @@ export default function SignInPage() {
   const router = useRouter();
 
   const { control, formState } = form;
-  const { isDirty, isValid, isSubmitting } = formState;
+  const { isValid, isSubmitting } = formState;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const { error } = await signIn.email({
@@ -114,7 +113,7 @@ export default function SignInPage() {
                     )}
                   />
                   <Field>
-                    <Button type="submit" disabled={!isDirty || !isValid || isSubmitting}>
+                    <Button type="submit" disabled={!isValid || isSubmitting}>
                       Login
                     </Button>
                     <FieldDescription className="text-center">

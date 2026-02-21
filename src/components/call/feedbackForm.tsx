@@ -1,7 +1,12 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import type { FeedbackData } from "@/types/response";
-import React, { useState } from "react";
 
 enum SatisfactionLevel {
   Positive = "😀",
@@ -9,53 +14,91 @@ enum SatisfactionLevel {
   Negative = "😔",
 }
 
+const formSchema = z
+  .object({
+    satisfaction: z.nativeEnum(SatisfactionLevel).nullable(),
+    feedback: z.string(),
+  })
+  .refine((d) => d.satisfaction !== null || d.feedback.trim().length > 0, {
+    message: "Please select a rating or add feedback",
+    path: ["satisfaction"],
+  });
+
+type FormValues = z.infer<typeof formSchema>;
+
 interface FeedbackFormProps {
   onSubmit: (data: Omit<FeedbackData, "interview_id">) => void;
   email: string;
 }
 
 export function FeedbackForm({ onSubmit, email }: FeedbackFormProps) {
-  const [satisfaction, setSatisfaction] = useState<SatisfactionLevel>(SatisfactionLevel.Moderate);
-  const [feedback, setFeedback] = useState("");
+  const { control, handleSubmit, setValue, watch, formState } = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      satisfaction: SatisfactionLevel.Moderate,
+      feedback: "",
+    },
+  });
 
-  const handleSubmit = () => {
-    if (satisfaction !== null || feedback.trim() !== "") {
-      onSubmit({
-        satisfaction: Object.values(SatisfactionLevel).indexOf(satisfaction),
-        feedback,
-        email,
-      });
-    }
+  const satisfaction = watch("satisfaction");
+
+  const handleFormSubmit = (values: FormValues) => {
+    onSubmit({
+      satisfaction: Object.values(SatisfactionLevel).indexOf(
+        values.satisfaction as SatisfactionLevel,
+      ),
+      feedback: values.feedback,
+      email,
+    });
   };
 
   return (
-    <div className="p-4">
-      <h3 className="text-lg font-semibold mb-4">Are you satisfied with the platform?</h3>
-      <div className="flex justify-center space-x-4 mb-4">
-        {Object.values(SatisfactionLevel).map((emoji) => (
-          <button
-            type="button"
-            key={emoji}
-            className={`text-3xl ${satisfaction === emoji ? "border-2 border-indigo-600" : ""}`}
-            onClick={() => setSatisfaction(emoji)}
-          >
-            {emoji}
-          </button>
-        ))}
-      </div>
-      <Textarea
-        value={feedback}
-        placeholder="Add your feedback here"
-        className="mb-4"
-        onChange={(e) => setFeedback(e.target.value)}
-      />
-      <Button
-        disabled={satisfaction === null || feedback.trim() === ""}
-        className="w-full bg-indigo-600 text-white"
-        onClick={handleSubmit}
-      >
+    <form className="p-4" onSubmit={handleSubmit(handleFormSubmit)}>
+      <p className="mb-4 font-semibold text-lg">Are you satisfied with the platform?</p>
+      <FieldGroup>
+        <Field data-invalid={!!formState.errors.satisfaction}>
+          <FieldContent>
+            <div className="flex justify-center space-x-4">
+              {Object.values(SatisfactionLevel).map((emoji) => (
+                <button
+                  type="button"
+                  key={emoji}
+                  className={`text-3xl ${satisfaction === emoji ? "rounded border-2 border-primary" : ""}`}
+                  onClick={() => setValue("satisfaction", emoji, { shouldValidate: true })}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </FieldContent>
+          {formState.errors.satisfaction && (
+            <FieldError>{formState.errors.satisfaction.message}</FieldError>
+          )}
+        </Field>
+
+        <Controller
+          control={control}
+          name="feedback"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="feedback">Feedback</FieldLabel>
+              <FieldContent>
+                <Textarea
+                  {...field}
+                  id="feedback"
+                  placeholder="Add your feedback here"
+                  aria-invalid={fieldState.invalid}
+                />
+              </FieldContent>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </FieldGroup>
+
+      <Button type="submit" disabled={!formState.isValid} className="mt-4 w-full">
         Submit Feedback
       </Button>
-    </div>
+    </form>
   );
 }

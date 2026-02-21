@@ -1,5 +1,5 @@
 import Call from "@/components/call";
-import { getInterviewById } from "@/services/interviews.service";
+import { getInterviewById } from "@/lib/data/interviews";
 import type { Metadata } from "next";
 import Image from "next/image";
 
