@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -7,7 +8,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import React, { useEffect, useState } from "react";
 
 const useTabSwitchPrevention = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -49,7 +49,7 @@ function TabSwitchWarning() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogAction
-            className="bg-indigo-400 hover:bg-indigo-600 text-white"
+            className="bg-indigo-400 text-white hover:bg-indigo-600"
             onClick={handleUnderstand}
           >
             I understand

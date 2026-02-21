@@ -1,6 +1,17 @@
 "use client";
 
-import { registerCall } from "@/actions/call.actions";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlarmClockIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
+import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { RetellWebClient } from "retell-client-js-sdk";
+import { toast } from "sonner";
+import { z } from "zod";
+import { registerCall } from "@/actions/call";
+import { submitFeedback } from "@/actions/feedback";
+import { getInterviewerAction } from "@/actions/interviewers";
+import { createResponse, getAllEmailsAction, updateResponse } from "@/actions/responses";
 import { FeedbackForm } from "@/components/call/feedbackForm";
 import {
   AlertDialog,
@@ -13,23 +24,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { isLightColor, testEmail } from "@/lib/utils";
-import { submitFeedback } from "@/services/feedback.service";
-import { getInterviewer } from "@/services/interviewers.service";
-import { createResponse, getAllEmails, saveResponse } from "@/services/responses.service";
+import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { isLightColor } from "@/lib/utils";
 import type { Interview } from "@/types/interview";
 import type { FeedbackData } from "@/types/response";
-import { AlarmClockIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
-import Image from "next/image";
-import React, { useState, useEffect, useRef } from "react";
-import { RetellWebClient } from "retell-client-js-sdk";
-import { toast } from "sonner";
 import MiniLoader from "../loaders/mini-loader/miniLoader";
 import { Button } from "../ui/button";
 import { Card, CardHeader, CardTitle } from "../ui/card";
 import { TabSwitchWarning, useTabSwitchPrevention } from "./tabSwitchPrevention";
 
 const webClient = new RetellWebClient();
+
+const formSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  name: z.string().min(1, "Name is required"),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 type InterviewProps = {
   interview: Interview;
@@ -48,9 +60,6 @@ function Call({ interview }: InterviewProps) {
   const [isStarted, setIsStarted] = useState(false);
   const [isEnded, setIsEnded] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
-  const [email, setEmail] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [isValidEmail, setIsValidEmail] = useState<boolean>(false);
   const [isOldUser, setIsOldUser] = useState<boolean>(false);
   const [callId, setCallId] = useState<string>("");
   const { tabSwitchCount } = useTabSwitchPrevention();
@@ -63,27 +72,30 @@ function Call({ interview }: InterviewProps) {
 
   const lastUserResponseRef = useRef<HTMLDivElement | null>(null);
 
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    mode: "onChange",
+    defaultValues: { email: "", name: "" },
+  });
+
+  const { control, formState, getValues } = form;
+
   const handleFeedbackSubmit = async (formData: Omit<FeedbackData, "interview_id">) => {
     try {
-      const result = await submitFeedback({
+      await submitFeedback({
         ...formData,
         interview_id: interview.id,
       });
-
-      if (result) {
-        toast.success("Thank you for your feedback!");
-        setIsFeedbackSubmitted(true);
-        setIsDialogOpen(false);
-      } else {
-        toast.error("Failed to submit feedback. Please try again.");
-      }
+      toast.success("Thank you for your feedback!");
+      setIsFeedbackSubmitted(true);
+      setIsDialogOpen(false);
     } catch (error) {
       console.error("Error submitting feedback:", error);
       toast.error("An error occurred. Please try again later.");
     }
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to bottom on new response
   useEffect(() => {
     if (lastUserResponseRef.current) {
       const { current } = lastUserResponseRef;
@@ -91,7 +103,7 @@ function Call({ interview }: InterviewProps) {
     }
   }, [lastUserResponse]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: timer logic depends on mutable time ref
   useEffect(() => {
     let intervalId: any;
     if (isCalling) {
@@ -107,12 +119,6 @@ function Call({ interview }: InterviewProps) {
     return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCalling, time, currentTimeDuration]);
-
-  useEffect(() => {
-    if (testEmail(email)) {
-      setIsValidEmail(true);
-    }
-  }, [email]);
 
   useEffect(() => {
     webClient.on("call_started", () => {
@@ -175,6 +181,7 @@ function Call({ interview }: InterviewProps) {
   };
 
   const startConversation = async () => {
+    const { email, name } = getValues();
     const data = {
       mins: interview?.timeDuration,
       objective: interview?.objective,
@@ -183,9 +190,8 @@ function Call({ interview }: InterviewProps) {
     };
     setLoading(true);
 
-    const oldUserEmails: string[] = (await getAllEmails(interview.id)).map(
-      (item: any) => item.email,
-    );
+    const emailsList = await getAllEmailsAction(interview.id);
+    const oldUserEmails: string[] = emailsList.map((item: any) => item.email);
     const OldUser =
       oldUserEmails.includes(email) ||
       (interview?.respondents && !interview?.respondents.includes(email));
@@ -231,18 +237,18 @@ function Call({ interview }: InterviewProps) {
 
   useEffect(() => {
     const fetchInterviewer = async () => {
-      const interviewer = await getInterviewer(interview.interviewerId);
-      setInterviewerImg(interviewer.image);
+      const data = await getInterviewerAction(Number(interview.interviewerId));
+      if (data?.image) setInterviewerImg(data.image);
     };
     fetchInterviewer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interview.interviewerId]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only run when isEnded changes
   useEffect(() => {
     if (isEnded) {
       const updateInterview = async () => {
-        await saveResponse({ isEnded: true, tabSwitchCount: tabSwitchCount }, callId);
+        await updateResponse({ isEnded: true, tabSwitchCount: tabSwitchCount }, callId);
       };
 
       updateInterview();
@@ -251,14 +257,14 @@ function Call({ interview }: InterviewProps) {
   }, [isEnded]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-background">
       {isStarted && <TabSwitchWarning />}
-      <div className="bg-white rounded-md md:w-[80%] w-[90%]">
-        <Card className="h-[88vh] rounded-lg border-2 border-b-4 border-r-4 border-black text-xl font-bold transition-all  md:block dark:border-white ">
+      <div className="w-[90%] rounded-md bg-card md:w-[80%]">
+        <Card className="min-h-[88vh] overflow-y-auto rounded-lg border-2 border-border border-r-4 border-b-4 font-bold text-xl transition-all md:block">
           <div>
-            <div className="m-4 h-[15px] rounded-lg border-[1px]  border-black">
+            <div className="m-4 h-[15px] rounded-lg border-[1px] border-border">
               <div
-                className=" bg-indigo-600 h-[15px] rounded-lg"
+                className="h-[15px] rounded-lg bg-primary"
                 style={{
                   width: isEnded
                     ? "100%"
@@ -270,17 +276,17 @@ function Call({ interview }: InterviewProps) {
             </div>
             <CardHeader className="items-center p-1">
               {!isEnded && (
-                <CardTitle className="flex flex-row items-center text-lg md:text-xl font-bold mb-2">
+                <CardTitle className="mb-2 flex flex-row items-center font-bold text-lg md:text-xl">
                   {interview?.name}
                 </CardTitle>
               )}
               {!isEnded && (
-                <div className="flex mt-2 flex-row">
+                <div className="mt-2 flex flex-row">
                   <AlarmClockIcon
-                    className="text-indigo-600 h-[1rem] w-[1rem] rotate-0 scale-100  dark:-rotate-90 dark:scale-0 mr-2 font-bold"
+                    className="mr-2 h-[1rem] w-[1rem] rotate-0 scale-100 font-bold text-primary dark:-rotate-90 dark:scale-0"
                     style={{ color: interview.themeColor }}
                   />
-                  <div className="text-sm font-normal">
+                  <div className="font-normal text-sm">
                     Expected duration:{" "}
                     <span className="font-bold" style={{ color: interview.themeColor }}>
                       {interviewTimeDuration} mins{" "}
@@ -291,10 +297,10 @@ function Call({ interview }: InterviewProps) {
               )}
             </CardHeader>
             {!isStarted && !isEnded && !isOldUser && (
-              <div className="w-fit min-w-[400px] max-w-[400px] mx-auto mt-2  border border-indigo-200 rounded-md p-2 m-2 bg-slate-50">
+              <div className="m-2 mx-auto mt-2 w-fit min-w-[400px] max-w-[400px] rounded-md border border-primary/20 bg-muted p-2">
                 <div>
                   {interview?.logoUrl && (
-                    <div className="p-1 flex justify-center">
+                    <div className="flex justify-center p-1">
                       <Image
                         src={interview?.logoUrl}
                         alt="Logo"
@@ -304,7 +310,7 @@ function Call({ interview }: InterviewProps) {
                       />
                     </div>
                   )}
-                  <div className="p-2 font-normal text-sm mb-4 whitespace-pre-line">
+                  <div className="mb-4 whitespace-pre-line p-2 font-normal text-sm">
                     {interview?.description}
                     <p className="font-bold text-sm">
                       {"\n"}Ensure your volume is up and grant microphone access when prompted.
@@ -313,34 +319,60 @@ function Call({ interview }: InterviewProps) {
                     </p>
                   </div>
                   {!interview?.isAnonymous && (
-                    <div className="flex flex-col gap-2 justify-center">
-                      <div className="flex justify-center">
-                        <input
-                          value={email}
-                          className="h-fit mx-auto py-2 border-2 rounded-md w-[75%] self-center px-2 border-gray-400 text-sm font-normal"
-                          placeholder="Enter your email address"
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </div>
-                      <div className="flex justify-center">
-                        <input
-                          value={name}
-                          className="h-fit mb-4 mx-auto py-2 border-2 rounded-md w-[75%] self-center px-2 border-gray-400 text-sm font-normal"
-                          placeholder="Enter your first name"
-                          onChange={(e) => setName(e.target.value)}
-                        />
-                      </div>
-                    </div>
+                    <FieldGroup className="px-4 pb-2">
+                      <Controller
+                        control={control}
+                        name="email"
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor="email" className="font-normal text-sm">
+                              Email address
+                            </FieldLabel>
+                            <FieldContent>
+                              <Input
+                                {...field}
+                                id="email"
+                                placeholder="Enter your email address"
+                                aria-invalid={fieldState.invalid}
+                                className="font-normal text-sm"
+                              />
+                            </FieldContent>
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                          </Field>
+                        )}
+                      />
+                      <Controller
+                        control={control}
+                        name="name"
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor="name" className="font-normal text-sm">
+                              First name
+                            </FieldLabel>
+                            <FieldContent>
+                              <Input
+                                {...field}
+                                id="name"
+                                placeholder="Enter your first name"
+                                aria-invalid={fieldState.invalid}
+                                className="font-normal text-sm"
+                              />
+                            </FieldContent>
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                          </Field>
+                        )}
+                      />
+                    </FieldGroup>
                   )}
                 </div>
-                <div className="w-[80%] flex flex-row mx-auto justify-center items-center align-middle">
+                <div className="mx-auto flex w-[80%] flex-row items-center justify-center align-middle">
                   <Button
-                    className="min-w-20 h-10 rounded-lg flex flex-row justify-center mb-8"
+                    className="mb-8 flex h-10 min-w-20 flex-row justify-center rounded-lg"
                     style={{
                       backgroundColor: interview.themeColor ?? "#4F46E5",
                       color: isLightColor(interview.themeColor ?? "#4F46E5") ? "black" : "white",
                     }}
-                    disabled={Loading || (!interview?.isAnonymous && (!isValidEmail || !name))}
+                    disabled={Loading || (!interview?.isAnonymous && !formState.isValid)}
                     onClick={startConversation}
                   >
                     {!Loading ? "Start Interview" : <MiniLoader />}
@@ -348,7 +380,7 @@ function Call({ interview }: InterviewProps) {
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
-                        className="bg-white border ml-2 text-black min-w-15 h-10 rounded-lg flex flex-row justify-center mb-8"
+                        className="mb-8 ml-2 flex h-10 min-w-15 flex-row justify-center rounded-lg border bg-card text-foreground"
                         style={{ borderColor: interview.themeColor }}
                         disabled={Loading}
                       >
@@ -362,7 +394,7 @@ function Call({ interview }: InterviewProps) {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          className="bg-indigo-600 hover:bg-indigo-800"
+                          className="bg-primary hover:bg-primary/90"
                           onClick={async () => {
                             await onEndCallClick();
                           }}
@@ -376,23 +408,19 @@ function Call({ interview }: InterviewProps) {
               </div>
             )}
             {isStarted && !isEnded && !isOldUser && (
-              <div className="flex flex-row p-2 grow">
-                <div className="border-x-2 border-grey w-[50%] my-auto min-h-[70%]">
+              <div className="flex grow flex-row p-2">
+                <div className="my-auto min-h-[70%] w-[50%] border-border border-x-2">
                   <div className="flex flex-col justify-evenly">
-                    <div
-                      className={
-                        "text-[22px] w-[80%] md:text-[26px] mt-4 min-h-[250px] mx-auto px-6"
-                      }
-                    >
+                    <div className={"mx-auto mt-4 min-h-[250px] w-[80%] px-6 text-sm md:text-base"}>
                       {lastInterviewerResponse}
                     </div>
-                    <div className="flex flex-col mx-auto justify-center items-center align-middle">
+                    <div className="mx-auto flex flex-col items-center justify-center align-middle">
                       <Image
                         src={interviewerImg}
                         alt="Image of the interviewer"
                         width={120}
                         height={120}
-                        className={`object-cover object-center mx-auto my-auto ${
+                        className={`mx-auto my-auto object-cover object-center ${
                           activeTurn === "agent"
                             ? `border-4 border-[${interview.themeColor}] rounded-full`
                             : ""
@@ -403,22 +431,22 @@ function Call({ interview }: InterviewProps) {
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-evenly w-[50%]">
+                <div className="flex w-[50%] flex-col justify-evenly">
                   <div
                     ref={lastUserResponseRef}
                     className={
-                      "text-[22px] w-[80%] md:text-[26px] mt-4 mx-auto h-[250px] px-6 overflow-y-auto"
+                      "mx-auto mt-4 h-[250px] w-[80%] overflow-y-auto overflow-x-hidden break-words px-6 text-sm md:text-base"
                     }
                   >
                     {lastUserResponse}
                   </div>
-                  <div className="flex flex-col mx-auto justify-center items-center align-middle">
+                  <div className="mx-auto flex flex-col items-center justify-center align-middle">
                     <Image
                       src={"/user-icon.png"}
                       alt="Picture of the user"
                       width={120}
                       height={120}
-                      className={`object-cover object-center mx-auto my-auto ${
+                      className={`mx-auto my-auto object-cover object-center ${
                         activeTurn === "user"
                           ? `border-4 border-[${interview.themeColor}] rounded-full`
                           : ""
@@ -432,13 +460,13 @@ function Call({ interview }: InterviewProps) {
             {isStarted && !isEnded && !isOldUser && (
               <div className="items-center p-2">
                 <AlertDialog>
-                  <AlertDialogTrigger className="w-full">
+                  <AlertDialogTrigger asChild>
                     <Button
-                      className=" bg-white text-black border  border-indigo-600 h-10 mx-auto flex flex-row justify-center mb-8"
+                      className="mx-auto mb-8 flex h-10 w-full flex-row justify-center border border-primary bg-card text-foreground"
                       disabled={Loading}
                     >
                       End Interview{" "}
-                      <XCircleIcon className="h-[1.5rem] ml-2 w-[1.5rem] rotate-0 scale-100  dark:-rotate-90 dark:scale-0 text-red" />
+                      <XCircleIcon className="ml-2 h-[1.5rem] w-[1.5rem] rotate-0 scale-100 text-red dark:-rotate-90 dark:scale-0" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -451,7 +479,7 @@ function Call({ interview }: InterviewProps) {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        className="bg-indigo-600 hover:bg-indigo-800"
+                        className="bg-primary hover:bg-primary/90"
                         onClick={async () => {
                           await onEndCallClick();
                         }}
@@ -465,11 +493,11 @@ function Call({ interview }: InterviewProps) {
             )}
 
             {isEnded && !isOldUser && (
-              <div className="w-fit min-w-[400px] max-w-[400px] mx-auto mt-2  border border-indigo-200 rounded-md p-2 m-2 bg-slate-50  absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+              <div className="absolute top-1/2 left-1/2 m-2 mx-auto mt-2 w-fit min-w-[400px] max-w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-md border border-primary/20 bg-muted p-2">
                 <div>
-                  <div className="p-2 font-normal text-base mb-4 whitespace-pre-line">
-                    <CheckCircleIcon className="h-[2rem] w-[2rem] mx-auto my-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-indigo-500 " />
-                    <p className="text-lg font-semibold text-center">
+                  <div className="mb-4 whitespace-pre-line p-2 font-normal text-base">
+                    <CheckCircleIcon className="mx-auto my-4 h-[2rem] w-[2rem] rotate-0 scale-100 text-primary transition-all dark:-rotate-90 dark:scale-0" />
+                    <p className="text-center font-semibold text-lg">
                       {isStarted
                         ? "Thank you for taking the time to participate in this interview"
                         : "Thank you very much for considering."}
@@ -482,16 +510,16 @@ function Call({ interview }: InterviewProps) {
 
                   {!isFeedbackSubmitted && (
                     <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                      <AlertDialogTrigger className="w-full flex justify-center">
+                      <AlertDialogTrigger asChild>
                         <Button
-                          className="bg-indigo-600 text-white h-10 mt-4 mb-4"
+                          className="mt-4 mb-4 h-10 w-full bg-primary text-primary-foreground"
                           onClick={() => setIsDialogOpen(true)}
                         >
                           Provide Feedback
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
-                        <FeedbackForm email={email} onSubmit={handleFeedbackSubmit} />
+                        <FeedbackForm email={getValues("email")} onSubmit={handleFeedbackSubmit} />
                       </AlertDialogContent>
                     </AlertDialog>
                   )}
@@ -499,11 +527,11 @@ function Call({ interview }: InterviewProps) {
               </div>
             )}
             {isOldUser && (
-              <div className="w-fit min-w-[400px] max-w-[400px] mx-auto mt-2  border border-indigo-200 rounded-md p-2 m-2 bg-slate-50  absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+              <div className="absolute top-1/2 left-1/2 m-2 mx-auto mt-2 w-fit min-w-[400px] max-w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-md border border-primary/20 bg-muted p-2">
                 <div>
-                  <div className="p-2 font-normal text-base mb-4 whitespace-pre-line">
-                    <CheckCircleIcon className="h-[2rem] w-[2rem] mx-auto my-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-indigo-500 " />
-                    <p className="text-lg font-semibold text-center">
+                  <div className="mb-4 whitespace-pre-line p-2 font-normal text-base">
+                    <CheckCircleIcon className="mx-auto my-4 h-[2rem] w-[2rem] rotate-0 scale-100 text-primary transition-all dark:-rotate-90 dark:scale-0" />
+                    <p className="text-center font-semibold text-lg">
                       You have already responded in this interview or you are not eligible to
                       respond. Thank you!
                     </p>
@@ -516,15 +544,15 @@ function Call({ interview }: InterviewProps) {
               </div>
             )}
           </div>
-        </Card>
-        <div className="flex flex-row justify-center align-middle mt-3">
-          <div className="text-center text-md font-semibold mr-2">
-            Powered by{" "}
-            <span className="font-bold">
-              Open<span className="text-indigo-600">Hire</span>
-            </span>
+          <div className="mt-3 flex flex-row justify-center pb-3 align-middle">
+            <div className="mr-2 text-center font-semibold text-md">
+              Powered by{" "}
+              <span className="font-bold">
+                Open<span className="text-primary">Hire</span>
+              </span>
+            </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

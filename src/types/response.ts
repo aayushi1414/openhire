@@ -1,5 +1,7 @@
-export interface Response {
-  id: bigint;
+export type Response = InterviewDetailTableResponse;
+
+export interface InterviewDetailTableResponse {
+  id: number;
   createdAt: Date;
   name: string | null;
   interviewerId: string;
@@ -8,11 +10,11 @@ export interface Response {
   details: any;
   isAnalysed: boolean;
   email: string;
-  is_ended: boolean;
-  is_viewed: boolean;
+  isEnded: boolean;
+  isViewed: boolean;
   analytics: any;
-  candidate_status: string;
-  tab_switch_count: number;
+  candidateStatus: string;
+  tabSwitchCount: number;
 }
 
 export interface Analytics {

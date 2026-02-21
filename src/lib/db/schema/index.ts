@@ -1,6 +1,7 @@
 import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 export * from "./auth";
+
 import { user } from "./auth";
 
 export const interviewer = pgTable("interviewer", {
@@ -33,7 +34,6 @@ export const interview = pgTable("interview", {
   readableSlug: text("readable_slug"),
   questions: jsonb("questions"),
   quotes: jsonb("quotes").array(),
-  insights: text("insights").array(),
   respondents: text("respondents").array(),
   questionCount: integer("question_count"),
   responseCount: integer("response_count"),

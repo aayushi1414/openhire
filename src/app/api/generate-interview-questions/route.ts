@@ -1,7 +1,7 @@
-import { logger } from "@/lib/logger";
-import { SYSTEM_PROMPT, generateQuestionsPrompt } from "@/lib/prompts/generate-questions";
 import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
+import { logger } from "@/lib/logger";
+import { generateQuestionsPrompt, SYSTEM_PROMPT } from "@/lib/prompts/generate-questions";
 
 export const maxDuration = 60;
 
@@ -17,7 +17,6 @@ export async function POST(req: Request) {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
     maxRetries: 5,
-    dangerouslyAllowBrowser: true,
   });
 
   try {
@@ -43,7 +42,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       {
-        response: content,
+        response: JSON.parse(content ?? "{}"),
       },
       { status: 200 },
     );

@@ -1,6 +1,6 @@
-import { analyzeCall } from "@/actions/call.actions";
-import { logger } from "@/lib/logger";
 import { NextResponse } from "next/server";
+import { analyzeCall } from "@/actions/call";
+import { logger } from "@/lib/logger";
 
 export async function POST(req: Request) {
   logger.info("get-call request received");
