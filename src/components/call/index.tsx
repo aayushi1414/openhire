@@ -95,7 +95,7 @@ function Call({ interview }: InterviewProps) {
     }
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll to bottom on new response
   useEffect(() => {
     if (lastUserResponseRef.current) {
       const { current } = lastUserResponseRef;
@@ -103,7 +103,7 @@ function Call({ interview }: InterviewProps) {
     }
   }, [lastUserResponse]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: timer logic depends on mutable time ref
   useEffect(() => {
     let intervalId: any;
     if (isCalling) {
@@ -244,7 +244,7 @@ function Call({ interview }: InterviewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interview.interviewerId]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only run when isEnded changes
   useEffect(() => {
     if (isEnded) {
       const updateInterview = async () => {
@@ -337,9 +337,7 @@ function Call({ interview }: InterviewProps) {
                                 className="font-normal text-sm"
                               />
                             </FieldContent>
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                           </Field>
                         )}
                       />
@@ -360,9 +358,7 @@ function Call({ interview }: InterviewProps) {
                                 className="font-normal text-sm"
                               />
                             </FieldContent>
-                            {fieldState.invalid && (
-                              <FieldError errors={[fieldState.error]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                           </Field>
                         )}
                       />
@@ -415,11 +411,7 @@ function Call({ interview }: InterviewProps) {
               <div className="flex grow flex-row p-2">
                 <div className="my-auto min-h-[70%] w-[50%] border-border border-x-2">
                   <div className="flex flex-col justify-evenly">
-                    <div
-                      className={
-                        "mx-auto mt-4 min-h-[250px] w-[80%] px-6 text-sm md:text-base"
-                      }
-                    >
+                    <div className={"mx-auto mt-4 min-h-[250px] w-[80%] px-6 text-sm md:text-base"}>
                       {lastInterviewerResponse}
                     </div>
                     <div className="mx-auto flex flex-col items-center justify-center align-middle">

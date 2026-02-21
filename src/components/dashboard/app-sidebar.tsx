@@ -1,5 +1,9 @@
 "use client";
 
+import { LogOut, PlayCircleIcon } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   Sidebar,
   SidebarContent,
@@ -12,10 +16,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { signOut, useSession } from "@/lib/auth/client";
-import { LogOut, PlayCircleIcon } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
@@ -35,8 +35,8 @@ export default function AppSidebar() {
       <SidebarHeader className="border-sidebar-border border-b p-4 group-data-[collapsible=icon]:p-2">
         <div className="flex items-center gap-3">
           <div className="flex items-baseline gap-2 group-data-[collapsible=icon]:hidden">
-            <div className="text-2xl font-semibold text-slate-800">
-              Open<span className="text-primary font-extrabold">Hire</span>
+            <div className="font-semibold text-2xl text-slate-800">
+              Open<span className="font-extrabold text-primary">Hire</span>
             </div>
             <Badge variant="secondary" className="text-[10px]">
               Alpha

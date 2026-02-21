@@ -2,11 +2,11 @@ import { Spinner } from "../ui/spinner";
 
 export function CustomSpinner() {
   return (
-    <div className="flex w-full flex-col items-center gap-4 justify-center min-h-60">
+    <div className="flex min-h-60 w-full flex-col items-center justify-center gap-4">
       <Spinner className="size-10 text-primary" />
-      <div className="text-center space-y-2">
-        <p className="text-primary text-lg font-bold">Creating Questions</p>
-        <p className="text-muted-foreground text-sm max-w-sm">
+      <div className="space-y-2 text-center">
+        <p className="font-bold text-lg text-primary">Creating Questions</p>
+        <p className="max-w-sm text-muted-foreground text-sm">
           We're creating intelligent questions based on the interview objectives. This will take few
           moments...
         </p>

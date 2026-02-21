@@ -73,14 +73,12 @@ function FileUpload({
           })}
         >
           <input {...getInputProps()} />
-          <>
-            <Upload className="h-8 w-8 text-primary" />
-            <p className="mt-1 text-foreground text-sm">
-              Drag &amp; drop files or{" "}
-              <span className="cursor-pointer font-medium text-primary underline">Browse</span>
-            </p>
-            <p className="text-muted-foreground text-xs">Supported formats: PDF (Max 10.0 MB)</p>
-          </>
+          <Upload className="h-8 w-8 text-primary" />
+          <p className="mt-1 text-foreground text-sm">
+            Drag &amp; drop files or{" "}
+            <span className="cursor-pointer font-medium text-primary underline">Browse</span>
+          </p>
+          <p className="text-muted-foreground text-xs">Supported formats: PDF (Max 10.0 MB)</p>
         </div>
       ) : (
         <div className="text-left">

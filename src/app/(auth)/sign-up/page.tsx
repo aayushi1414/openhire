@@ -1,11 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { signUp } from "@/lib/auth/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
@@ -13,6 +7,12 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { signUp } from "@/lib/auth/client";
 
 const formSchema = z.object({
   name: z.string().nonempty("Name is required"),
@@ -66,8 +66,8 @@ export default function SignUpPage() {
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-baseline gap-2">
-              <div className="text-3xl font-semibold text-slate-800">
-                Open<span className="text-primary font-extrabold">Hire</span>
+              <div className="font-semibold text-3xl text-slate-800">
+                Open<span className="font-extrabold text-primary">Hire</span>
               </div>
               <Badge variant="secondary" className="text-[10px]">
                 Alpha

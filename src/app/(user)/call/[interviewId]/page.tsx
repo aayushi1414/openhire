@@ -1,7 +1,7 @@
-import Call from "@/components/call";
-import { getInterviewById } from "@/lib/data/interviews";
 import type { Metadata } from "next";
 import Image from "next/image";
+import Call from "@/components/call";
+import { getInterviewById } from "@/lib/data/interviews";
 
 type Props = {
   params: Promise<{
@@ -28,16 +28,16 @@ function PopUpMessage({
   image: string;
 }) {
   return (
-    <div className="bg-white rounded-md absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 md:w-[80%] w-[90%]">
-      <div className="h-[88vh] content-center rounded-lg border-2 border-b-4 border-r-4 border-black font-bold transition-all  md:block dark:border-white ">
-        <div className="flex flex-col items-center justify-center my-auto">
+    <div className="absolute top-1/2 left-1/2 w-[90%] -translate-x-1/2 -translate-y-1/2 rounded-md bg-white md:w-[80%]">
+      <div className="h-[88vh] content-center rounded-lg border-2 border-black border-r-4 border-b-4 font-bold transition-all md:block dark:border-white">
+        <div className="my-auto flex flex-col items-center justify-center">
           <Image src={image} alt="Graphic" width={200} height={200} className="mb-4" />
-          <h1 className="text-md font-medium mb-2">{title}</h1>
+          <h1 className="mb-2 font-medium text-md">{title}</h1>
           <p>{description}</p>
         </div>
       </div>
-      <div className="flex flex-row justify-center align-middle mt-3">
-        <div className="text-center text-md font-semibold mr-2">
+      <div className="mt-3 flex flex-row justify-center align-middle">
+        <div className="mr-2 text-center font-semibold text-md">
           Powered by{" "}
           <span className="font-bold">
             Open<span className="text-indigo-600">Hire</span>
@@ -54,7 +54,7 @@ export default async function InterviewInterface({ params }: Props) {
 
   return (
     <div>
-      <div className="hidden md:block p-8 mx-auto form-container">
+      <div className="form-container mx-auto hidden p-8 md:block">
         {!interview ? (
           <PopUpMessage
             title="Invalid URL"
@@ -71,14 +71,14 @@ export default async function InterviewInterface({ params }: Props) {
           <Call interview={interview as any} />
         )}
       </div>
-      <div className=" md:hidden flex flex-col items-center md:h-[0px] justify-center  my-auto">
+      <div className="my-auto flex flex-col items-center justify-center md:hidden md:h-[0px]">
         <div className="mt-48 px-3">
-          <p className="text-center my-5 text-md font-semibold">{interview?.name}</p>
-          <p className="text-center text-gray-600 my-5">
+          <p className="my-5 text-center font-semibold text-md">{interview?.name}</p>
+          <p className="my-5 text-center text-gray-600">
             Please use a PC to respond to the interview. Apologies for any inconvenience caused.{" "}
           </p>
         </div>
-        <div className="text-center text-md font-semibold mr-2 my-5">
+        <div className="my-5 mr-2 text-center font-semibold text-md">
           Powered by{" "}
           <span className="font-bold">
             Open<span className="text-indigo-600">Hire</span>

@@ -1,6 +1,6 @@
+import type { Metadata } from "next";
 import AppSidebar from "@/components/dashboard/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "OpenHire Dashboard",

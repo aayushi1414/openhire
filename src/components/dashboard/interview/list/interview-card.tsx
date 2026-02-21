@@ -18,7 +18,14 @@ interface Props {
   isActive: boolean;
 }
 
-function InterviewCard({ name, id, readableSlug, interviewerImage, responseCount, isActive }: Props) {
+function InterviewCard({
+  name,
+  id,
+  readableSlug,
+  interviewerImage,
+  responseCount,
+  isActive,
+}: Props) {
   const [copied, setCopied] = useState(false);
 
   const buildInterviewUrl = () => {
@@ -58,11 +65,17 @@ function InterviewCard({ name, id, readableSlug, interviewerImage, responseCount
         <CardContent className="flex h-full flex-col rounded-md bg-primary/10 p-2">
           {/* Top row: Active badge + action buttons */}
           <div className="flex items-center justify-between p-2">
-            <Badge className={`gap-1 border-0 text-[10px] text-background ${isActive ? "bg-green-500" : "bg-gray-400"}`}>
+            <Badge
+              className={`gap-1 border-0 text-[10px] text-background ${isActive ? "bg-green-500" : "bg-gray-400"}`}
+            >
               {isActive ? "Active" : "Inactive"}
             </Badge>
             <div className="flex gap-1">
-              <Button size="icon-xs" onClick={handleJumpToInterview} aria-label="Open interview in new tab">
+              <Button
+                size="icon-xs"
+                onClick={handleJumpToInterview}
+                aria-label="Open interview in new tab"
+              >
                 <ArrowUpRight />
               </Button>
               <Button

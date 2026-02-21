@@ -33,7 +33,10 @@ const formSchema = z.object({
       (val) => Number.isInteger(Number(val)) && Number(val) >= 1 && Number(val) <= 15,
       "Must be a whole number between 1 and 15",
     ),
-  interviewerId: z.number().int().refine((val) => val !== 0, "Please select an interviewer"),
+  interviewerId: z
+    .number()
+    .int()
+    .refine((val) => val !== 0, "Please select an interviewer"),
   isAnonymous: z.boolean(),
 });
 
@@ -157,213 +160,210 @@ export default function BasicInterviewInfo(props: BasicInterviewInfoProps) {
   };
 
   return (
-    <>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FieldGroup>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <FieldGroup>
+        <Controller
+          name="name"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Interview Name</FieldLabel>
+              <FieldContent>
+                <Input
+                  {...field}
+                  id={field.name}
+                  aria-invalid={fieldState.invalid}
+                  placeholder="e.g. Name of the Interview"
+                />
+              </FieldContent>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="interviewerId"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Select an Interviewer</FieldLabel>
+              <FieldContent>
+                <div className="relative flex items-center">
+                  <div className="flex gap-4">
+                    {interviewers.map((item) => (
+                      <div key={item.id.toString()} className="relative">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className={`h-auto flex-col border-2 px-4 py-2 hover:bg-background ${field.value === item.id ? "border-primary" : "border-border"}`}
+                          onClick={() => field.onChange(item.id)}
+                        >
+                          <Image
+                            src={item.image}
+                            alt="Picture of the interviewer"
+                            width={50}
+                            height={50}
+                            className="h-20 w-25 object-cover"
+                          />
+                          <CardTitle className="text-center text-xs">{item.name}</CardTitle>
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </FieldContent>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <div className="flex flex-wrap gap-4">
           <Controller
-            name="name"
+            name="numQuestions"
             control={control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Interview Name</FieldLabel>
+              <Field data-invalid={fieldState.invalid} className="min-w-35 flex-1">
+                <FieldLabel htmlFor={field.name}>Number of Questions (Max 05)</FieldLabel>
                 <FieldContent>
                   <Input
                     {...field}
                     id={field.name}
                     aria-invalid={fieldState.invalid}
-                    placeholder="e.g. Name of the Interview"
+                    type="number"
+                    step="1"
+                    max="5"
+                    min="1"
+                    placeholder="e.g. 3"
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      if (value === "" || (Number.isInteger(Number(value)) && Number(value) > 0)) {
+                        if (Number(value) > 5) {
+                          value = "5";
+                        }
+                        field.onChange(value);
+                      }
+                    }}
                   />
                 </FieldContent>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
-
           <Controller
-            name="interviewerId"
+            name="duration"
             control={control}
             render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Select an Interviewer</FieldLabel>
+              <Field data-invalid={fieldState.invalid} className="min-w-35 flex-1">
+                <FieldLabel htmlFor={field.name}>Duration (Max 15 Minutes)</FieldLabel>
                 <FieldContent>
                   <div className="relative flex items-center">
-                    <div className="flex gap-4">
-                      {interviewers.map((item) => (
-                        <div key={item.id.toString()} className="relative">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className={`h-auto flex-col border-2 px-4 py-2 hover:bg-background ${field.value === item.id ? "border-primary" : "border-border"}`}
-                            onClick={() => field.onChange(item.id)}
-                          >
-                            <Image
-                              src={item.image}
-                              alt="Picture of the interviewer"
-                              width={50}
-                              height={50}
-                              className="h-20 w-25 object-cover"
-                            />
-                            <CardTitle className="text-center text-xs">{item.name}</CardTitle>
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </FieldContent>
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-
-          <div className="flex flex-wrap gap-4">
-            <Controller
-              name="numQuestions"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="min-w-35 flex-1">
-                  <FieldLabel htmlFor={field.name}>Number of Questions (Max 05)</FieldLabel>
-                  <FieldContent>
                     <Input
                       {...field}
                       id={field.name}
                       aria-invalid={fieldState.invalid}
                       type="number"
                       step="1"
-                      max="5"
+                      max="15"
                       min="1"
-                      placeholder="e.g. 3"
+                      className="pr-12"
+                      placeholder="e.g. 10"
                       onChange={(e) => {
                         let value = e.target.value;
-                        if (value === "" || (Number.isInteger(Number(value)) && Number(value) > 0)) {
-                          if (Number(value) > 5) {
-                            value = "5";
+                        if (
+                          value === "" ||
+                          (Number.isInteger(Number(value)) && Number(value) > 0)
+                        ) {
+                          if (Number(value) > 15) {
+                            value = "15";
                           }
                           field.onChange(value);
                         }
                       }}
                     />
-                  </FieldContent>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name="duration"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid} className="min-w-35 flex-1">
-                  <FieldLabel htmlFor={field.name}>Duration (Max 15 Minutes)</FieldLabel>
-                  <FieldContent>
-                    <div className="relative flex items-center">
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        type="number"
-                        step="1"
-                        max="15"
-                        min="1"
-                        className="pr-12"
-                        placeholder="e.g. 10"
-                        onChange={(e) => {
-                          let value = e.target.value;
-                          if (
-                            value === "" ||
-                            (Number.isInteger(Number(value)) && Number(value) > 0)
-                          ) {
-                            if (Number(value) > 15) {
-                              value = "15";
-                            }
-                            field.onChange(value);
-                          }
-                        }}
-                      />
-                      <span className="pointer-events-none absolute right-3 text-muted-foreground text-sm">
-                        mins
-                      </span>
-                    </div>
-                  </FieldContent>
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </div>
-
-          <Controller
-            name="objective"
-            control={control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Objective of Interview</FieldLabel>
-                <FieldContent>
-                  <Textarea
-                    {...field}
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    className="h-24 w-full border border-border"
-                    placeholder="e.g. Find best candidates based on their technical skills and previous projects."
-                  />
+                    <span className="pointer-events-none absolute right-3 text-muted-foreground text-sm">
+                      mins
+                    </span>
+                  </div>
                 </FieldContent>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
+        </div>
 
-          <Field>
-            <FieldLabel>Upload job description</FieldLabel>
-            <FileUpload
-              isUploaded={isUploaded}
-              setIsUploaded={setIsUploaded}
-              fileName={fileName}
-              setFileName={setFileName}
-              setUploadedDocumentContext={setUploadedDocumentContext}
-            />
-          </Field>
+        <Controller
+          name="objective"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Objective of Interview</FieldLabel>
+              <FieldContent>
+                <Textarea
+                  {...field}
+                  id={field.name}
+                  aria-invalid={fieldState.invalid}
+                  className="h-24 w-full border border-border"
+                  placeholder="e.g. Find best candidates based on their technical skills and previous projects."
+                />
+              </FieldContent>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-          <Controller
-            name="isAnonymous"
-            control={control}
-            render={({ field }) => (
-              <Field>
-                <div className="flex cursor-pointer items-center">
-                  <span className="font-medium text-foreground text-sm">Anonymous responses?</span>
-                  <Switch
-                    checked={field.value}
-                    className="mt-1 ml-4"
-                    onCheckedChange={(checked) => field.onChange(checked)}
-                  />
-                </div>
-                <span className="text-muted-foreground text-xs italic">
-                  Note: If not anonymous, the interviewee&apos;s email and name will be collected.
-                </span>
-              </Field>
-            )}
+        <Field>
+          <FieldLabel>Upload job description</FieldLabel>
+          <FileUpload
+            isUploaded={isUploaded}
+            setIsUploaded={setIsUploaded}
+            fileName={fileName}
+            setFileName={setFileName}
+            setUploadedDocumentContext={setUploadedDocumentContext}
           />
+        </Field>
 
-          <Field>
-            <div className="mt-1 flex w-full flex-row items-center justify-between gap-3">
-              <Button
-                type="submit"
-                variant="outline"
-                disabled={!isValid || isSubmitting}
-                className="flex-1"
-                onClick={() => setSubmitAction("manual")}
-              >
-                {mode === "edit" ? "Edit questions manually" : "Create questions myself"}
-              </Button>
-              <Button
-                type="submit"
-                disabled={!isValid || isSubmitting}
-                className="flex-1 bg-primary"
-                onClick={() => setSubmitAction("generate")}
-              >
-                {mode === "edit" ? "✨ Regenerate questions" : "✨ Generate questions"}
-              </Button>
-            </div>
-          </Field>
-        </FieldGroup>
-      </form>
+        <Controller
+          name="isAnonymous"
+          control={control}
+          render={({ field }) => (
+            <Field>
+              <div className="flex cursor-pointer items-center">
+                <span className="font-medium text-foreground text-sm">Anonymous responses?</span>
+                <Switch
+                  checked={field.value}
+                  className="mt-1 ml-4"
+                  onCheckedChange={(checked) => field.onChange(checked)}
+                />
+              </div>
+              <span className="text-muted-foreground text-xs italic">
+                Note: If not anonymous, the interviewee&apos;s email and name will be collected.
+              </span>
+            </Field>
+          )}
+        />
 
-    </>
+        <Field>
+          <div className="mt-1 flex w-full flex-row items-center justify-between gap-3">
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={!isValid || isSubmitting}
+              className="flex-1"
+              onClick={() => setSubmitAction("manual")}
+            >
+              {mode === "edit" ? "Edit questions manually" : "Create questions myself"}
+            </Button>
+            <Button
+              type="submit"
+              disabled={!isValid || isSubmitting}
+              className="flex-1 bg-primary"
+              onClick={() => setSubmitAction("generate")}
+            >
+              {mode === "edit" ? "✨ Regenerate questions" : "✨ Generate questions"}
+            </Button>
+          </div>
+        </Field>
+      </FieldGroup>
+    </form>
   );
 }
