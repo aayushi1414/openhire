@@ -1,38 +1,48 @@
-# Base on Node.js LTS image
+# Define the base image for consistency
 FROM node:23-alpine AS base
+
+# Stage 1: Build the application
+FROM base AS builder
 
 # Set working directory
 WORKDIR /app
 
-# Install dependencies only when needed
-FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
-RUN npm i -g pnpm && pnpm install --frozen-lockfile
+# Install pnpm globally
+RUN npm install -g pnpm
 
-# Build the application
-FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package manager files and install dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the application code
 COPY . .
+
+# Build the application in standalone mode
 RUN pnpm build
 
-# Production image, copy all files and run
+# Stage 2: Serve the application
 FROM base AS runner
-ENV NODE_ENV production
 
-# Add a non-root user
+# Set working directory
+WORKDIR /app
+
+# Create a non-root user for better security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+# Copy the standalone build output and necessary files
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+
+# Change ownership of files for the non-root user
+RUN chown -R nextjs:nodejs /app
+
+# Switch to the non-root user
 USER nextjs
 
-# Copy built app
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/next.config.js ./next.config.js
-
-# Expose the application port
+# Expose the port used by the application
 EXPOSE 3000
 
 # Start the application
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]

@@ -1,33 +1,12 @@
 services:
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_USER: openhire
-      POSTGRES_PASSWORD: openhire
-      POSTGRES_DB: openhire
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U openhire -d openhire"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   app:
-    build: .
+    image: openhire-web:latest
+    container_name: openhire
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "${DOCKER_PORT:-3000}:3000"
+      - "3000:3000"
     env_file:
       - .env
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://openhire:openhire@postgres:5432/openhire
-    depends_on:
-      postgres:
-        condition: service_healthy
     restart: unless-stopped
-
-volumes:
-  postgres_data:
