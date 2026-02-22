@@ -2,10 +2,9 @@
 
 Open-source AI interviewing platform. Self-hosted.
 
-<!-- Add a screenshot:
-[![screenshot-dark](.github/screenshot-dark.webp#gh-dark-mode-only)](https://github.com/brijeshmarch16/openhire#gh-dark-mode-only)
-[![screenshot-light](.github/screenshot-light.webp#gh-light-mode-only)](https://github.com/brijeshmarch16/openhire#gh-light-mode-only)
--->
+
+[![Screenshot](.github/screenshot.png)](https://github.com/brijeshmarch16/openhire)
+
 
 ## Features
 - 🎯 **Interview Creation:** Instantly generate tailored interview questions from any job description.
