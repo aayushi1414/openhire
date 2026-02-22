@@ -1,5 +1,7 @@
 # Openhire
 
+> ⚠️ This project is in early alpha. Expect breaking changes.
+
 Open-source AI interviewing platform. Self-hosted.
 
 
