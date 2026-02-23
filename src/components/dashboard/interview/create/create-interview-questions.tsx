@@ -25,7 +25,7 @@ const schema = z.object({
   ),
 });
 
-type FormValues = z.infer<typeof schema>;
+export type FormValues = z.infer<typeof schema>;
 
 interface CreateInterviewQuestionsProps {
   interviewData: InterviewBase;
@@ -59,11 +59,6 @@ export default function CreateInterviewQuestions(props: CreateInterviewQuestions
 
   const endOfListRef = useRef<HTMLDivElement>(null);
   const prevQuestionLengthRef = useRef(fields.length);
-
-  const handleInputChange = (id: string, newQuestion: FormValues["questions"][number]) => {
-    const index = fields.findIndex((f) => f.id === id);
-    if (index !== -1) update(index, newQuestion);
-  };
 
   const handleDeleteQuestion = (id: string) => {
     const index = fields.findIndex((f) => f.id === id);
@@ -157,7 +152,8 @@ export default function CreateInterviewQuestions(props: CreateInterviewQuestions
               questionNumber={index + 1}
               questionData={field}
               onDelete={handleDeleteQuestion}
-              onQuestionChange={handleInputChange}
+              control={control}
+              index={index}
             />
           ))}
           <div ref={endOfListRef} />

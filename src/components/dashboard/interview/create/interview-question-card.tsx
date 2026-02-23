@@ -1,13 +1,16 @@
 import { Trash2 } from "lucide-react";
+import { type Control, Controller } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import type { Question } from "@/types/interview";
+import type { FormValues } from "./create-interview-questions";
 
 interface InterviewQuestionCardProps {
   questionNumber: number;
   questionData: Question;
-  onQuestionChange: (id: string, question: Question) => void;
+  control: Control<FormValues>;
+  index: number;
   onDelete: (id: string) => void;
 }
 
@@ -18,7 +21,8 @@ const depthLevels = [
 ] as const;
 
 export default function InterviewQuestionCard(Props: InterviewQuestionCardProps) {
-  const { questionNumber, questionData, onQuestionChange, onDelete } = Props;
+  const { questionNumber, questionData, control, index, onDelete } = Props;
+
   return (
     <Card className="shadow-sm">
       <CardContent className="p-4">
@@ -28,23 +32,27 @@ export default function InterviewQuestionCard(Props: InterviewQuestionCardProps)
 
           <div className="flex items-center gap-1.5">
             <span className="mr-1 font-semibold text-muted-foreground text-sm">Depth Level:</span>
-            {depthLevels.map(({ level, label }) => (
-              <Button
-                key={level}
-                type="button"
-                className={`h-7 px-3 text-xs hover:bg-primary/80 ${
-                  questionData?.followUpCount === level ? "bg-primary" : "opacity-50"
-                }`}
-                onClick={() =>
-                  onQuestionChange(questionData.id, {
-                    ...questionData,
-                    followUpCount: level,
-                  })
-                }
-              >
-                {label}
-              </Button>
-            ))}
+
+            <Controller
+              control={control}
+              name={`questions.${index}.followUpCount`}
+              render={({ field }) => (
+                <>
+                  {depthLevels.map(({ level, label }) => (
+                    <Button
+                      key={level}
+                      type="button"
+                      className={`h-7 px-3 text-xs hover:bg-primary/80 ${
+                        field.value === level ? "bg-primary" : "opacity-50"
+                      }`}
+                      onClick={() => field.onChange(level)}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </>
+              )}
+            />
 
             <button
               type="button"
@@ -57,23 +65,21 @@ export default function InterviewQuestionCard(Props: InterviewQuestionCardProps)
         </div>
 
         {/* Full-width textarea */}
-        <Textarea
-          value={questionData?.question}
-          className="resize-none border-2 border-input transition-colors focus:border-primary"
-          placeholder="e.g. Can you tell me about a challenging project you've worked on?"
-          rows={3}
-          onChange={(e) =>
-            onQuestionChange(questionData.id, {
-              ...questionData,
-              question: e.target.value,
-            })
-          }
-          onBlur={(e) =>
-            onQuestionChange(questionData.id, {
-              ...questionData,
-              question: e.target.value.trim(),
-            })
-          }
+        <Controller
+          control={control}
+          name={`questions.${index}.question`}
+          render={({ field }) => (
+            <Textarea
+              {...field}
+              className="resize-none border-2 border-input transition-colors focus:border-primary"
+              placeholder="e.g. Can you tell me about a challenging project you've worked on?"
+              rows={3}
+              onBlur={(e) => {
+                field.onChange(e.target.value.trim());
+                field.onBlur();
+              }}
+            />
+          )}
         />
       </CardContent>
     </Card>
