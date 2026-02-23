@@ -16,65 +16,23 @@ Open-source AI interviewing platform. Self-hosted.
 - 📈 **Comprehensive Dashboard:** Track all candidate performances and overall stats.
 
 
+## Tech Stack
+
+- [Next.js 16](https://nextjs.org/) (App Router)
+- [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
+- [Drizzle ORM](https://orm.drizzle.team/) + [Neon](https://neon.tech/) (Postgres)
+- [Better Auth](https://www.better-auth.com/)
+- [Retell AI](https://www.retellai.com/)
+- [OpenAI](https://openai.com/) + [LangChain](https://www.langchain.com/)
+- [pnpm](https://pnpm.io/)
+
+
 ## Documentation
 
-### Quickstart
-
-1. **Clone the repo and copy the env template**
-
-```bash
-git clone https://github.com/brijeshmarch16/openhire.git
-cd openhire
-cp .env.example .env
-```
-
-2. **Add your API keys to `.env`** — see the [Environment Variables](#environment-variables) table below.
-
-3. **Generate a secret for Better Auth** and set it as `BETTER_AUTH_SECRET`:
-
-```bash
-openssl rand -base64 32
-```
-
-4. **Set `BETTER_AUTH_URL`** to the base URL of your app (e.g. `http://localhost:3000`).
-
-5. **Point `DATABASE_URL`** at an existing Postgres instance (e.g. [Neon](https://neon.tech/)).
-
-6. **Install dependencies and push the schema:**
-
-```bash
-pnpm install
-pnpm db:migrate
-```
-
-7. **Start the dev server:**
-
-```bash
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see the app.
-
-### Environment Variables
-
-| Variable | Description |
-|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Base URL of your app (e.g. `http://localhost:3000`) |
-| `BETTER_AUTH_SECRET` | Random secret — generate with `openssl rand -base64 32` |
-| `BETTER_AUTH_URL` | Base URL of your app (e.g. `http://localhost:3000`) |
-| `DATABASE_URL` | Postgres connection string |
-| `RETELL_API_KEY` | API key from [Retell AI dashboard](https://dashboard.retellai.com/apiKey) |
-| `OPENAI_API_KEY` | API key from [OpenAI platform](https://platform.openai.com/api-keys) |
-
-### Self-Hosting
-
-**Option 1 — Docker:** Run the Next.js app in a container on your own server. Point `DATABASE_URL` at an external Postgres instance (e.g. [Neon](https://neon.tech/)):
-
-```bash
-docker-compose up -d
-```
-
-**Option 2 — Vercel + Neon:** Deploy the app to [Vercel](https://vercel.com/) and use [Neon](https://neon.tech/) for serverless Postgres. Set `DATABASE_URL` to your Neon connection string in the Vercel environment variables.
+- [Run Locally](./docs/run-locally.md)
+- [Deploy](./docs/deploy.md)
 
 ## Contributing
 
