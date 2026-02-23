@@ -219,7 +219,7 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
         accessorKey: "candidateStatus",
         size: 110,
         cell: ({ row }) => {
-          const status = row.original.candidateStatus;
+          const status = row.original.candidateStatus ?? CandidateStatus.NO_STATUS;
           const label =
             status === CandidateStatus.NO_STATUS
               ? "No Status"
@@ -326,7 +326,7 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
       </div>
 
       {/* Response table */}
-      <div className="flex w-full flex-col gap-2 px-3 pb-4">
+      <div className="flex w-full flex-col gap-2 pb-4">
         <InterviewDetailSearch
           filterStatus={filterStatus}
           onFilterStatusChange={setFilterStatus}
