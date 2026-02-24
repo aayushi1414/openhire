@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(result.data, { status: 200 });
-  } catch (error) {
+  } catch (_error) {
     logger.error("Error analyzing call");
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

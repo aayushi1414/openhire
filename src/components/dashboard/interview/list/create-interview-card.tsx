@@ -16,7 +16,7 @@ function CreateInterviewCard({ interviewers }: CreateInterviewCardProps) {
   return (
     <>
       <Card
-        className="flex h-64 shrink-0 cursor-pointer items-center overflow-hidden rounded-md border-2 border-border border-dashed"
+        className="flex h-64 shrink-0 cursor-pointer items-center overflow-hidden rounded-md border-2 border-border border-dashed shadow-none"
         onClick={() => {
           setOpen(true);
         }}

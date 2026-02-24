@@ -48,7 +48,7 @@ function InterviewCard({
       setTimeout(() => {
         setCopied(false);
       }, 2000);
-    } catch (err) {
+    } catch (_err) {
       toast.error("Could not copy link. Please copy it manually.", { position: "bottom-right" });
     }
   };
@@ -61,7 +61,7 @@ function InterviewCard({
 
   return (
     <Link href={`/interviews/${id}`}>
-      <Card className="relative h-64 w-full shrink-0 cursor-pointer gap-4 overflow-hidden rounded-md bg-background p-3">
+      <Card className="relative h-64 w-full shrink-0 cursor-pointer gap-4 overflow-hidden rounded-md bg-background p-3 shadow-none">
         <CardContent className="flex h-full flex-col rounded-md bg-primary/10 p-2">
           {/* Top row: Active badge + action buttons */}
           <div className="flex items-center justify-between p-2">
@@ -101,10 +101,6 @@ function InterviewCard({
         <CardFooter className="px-0">
           {/* Bottom row: response count + interviewer avatar */}
           <div className="flex w-full items-center justify-between">
-            <span className="flex items-center gap-2 font-bold text-primary/90 text-sm">
-              <span className="text-primary text-xl">●</span> {responseCount} Responses
-            </span>
-
             {interviewerImage && (
               <Image
                 src={interviewerImage}
@@ -114,6 +110,7 @@ function InterviewCard({
                 className="rounded-full object-cover object-center"
               />
             )}
+            <span className="font-bold text-primary/90 text-sm">{responseCount} Responses</span>
           </div>
         </CardFooter>
       </Card>

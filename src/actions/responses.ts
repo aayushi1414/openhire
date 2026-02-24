@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { response } from "@/lib/db/schema";
 
-export const createResponse = async (payload: any) => {
+export const createResponse = async (payload: typeof response.$inferInsert) => {
   try {
     const [created] = await db.insert(response).values(payload).returning({ id: response.id });
     return created?.id ?? null;
@@ -14,7 +14,10 @@ export const createResponse = async (payload: any) => {
   }
 };
 
-export const saveResponse = async (payload: any, call_id: string) => {
+export const saveResponse = async (
+  payload: Partial<typeof response.$inferInsert>,
+  call_id: string,
+) => {
   try {
     const updated = await db
       .update(response)
@@ -28,7 +31,10 @@ export const saveResponse = async (payload: any, call_id: string) => {
   }
 };
 
-export const updateResponse = async (payload: any, call_id: string) => {
+export const updateResponse = async (
+  payload: Partial<typeof response.$inferInsert>,
+  call_id: string,
+) => {
   try {
     const updated = await db
       .update(response)

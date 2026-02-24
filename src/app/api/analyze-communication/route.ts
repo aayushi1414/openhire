@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     logger.info("Communication analysis completed successfully");
 
     return NextResponse.json({ analysis: JSON.parse(analysis || "{}") }, { status: 200 });
-  } catch (error) {
+  } catch (_error) {
     logger.error("Error analyzing communication skills");
 
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

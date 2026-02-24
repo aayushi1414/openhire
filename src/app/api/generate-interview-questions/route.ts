@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       },
       { status: 200 },
     );
-  } catch (error) {
+  } catch (_error) {
     logger.error("Error generating interview questions");
 
     return NextResponse.json({ error: "internal server error" }, { status: 500 });
