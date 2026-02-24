@@ -101,10 +101,6 @@ function InterviewCard({
         <CardFooter className="px-0">
           {/* Bottom row: response count + interviewer avatar */}
           <div className="flex w-full items-center justify-between">
-            <span className="flex items-center gap-2 font-bold text-primary/90 text-sm">
-              <span className="text-primary text-xl">●</span> {responseCount} Responses
-            </span>
-
             {interviewerImage && (
               <Image
                 src={interviewerImage}
@@ -114,6 +110,7 @@ function InterviewCard({
                 className="rounded-full object-cover object-center"
               />
             )}
+            <span className="font-bold text-primary/90 text-sm">{responseCount} Responses</span>
           </div>
         </CardFooter>
       </Card>
