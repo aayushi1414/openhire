@@ -61,7 +61,7 @@ function InterviewCard({
 
   return (
     <Link href={`/interviews/${id}`}>
-      <Card className="relative h-64 w-full shrink-0 cursor-pointer gap-4 overflow-hidden rounded-md bg-background p-3">
+      <Card className="relative h-64 w-full shrink-0 cursor-pointer gap-4 overflow-hidden rounded-md bg-background p-3 shadow-none">
         <CardContent className="flex h-full flex-col rounded-md bg-primary/10 p-2">
           {/* Top row: Active badge + action buttons */}
           <div className="flex items-center justify-between p-2">
