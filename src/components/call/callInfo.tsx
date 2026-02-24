@@ -203,7 +203,7 @@ function CallInfo({
           </div>
         </div>
       </div>
-      <div className="my-3 min-h-[120px] rounded-xl bg-muted p-4 px-5">
+      <div className="my-3 min-h-30 rounded-xl bg-muted p-4 px-5">
         <p className="my-2 font-semibold">General Summary</p>
 
         <div className="my-2 mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -217,7 +217,7 @@ function CallInfo({
                 <div className="font-medium">
                   <span className="font-normal">Feedback: </span>
                   {analytics?.overallFeedback === undefined ? (
-                    <Skeleton className="h-[20px] w-[200px]" />
+                    <Skeleton className="h-5 w-50" />
                   ) : (
                     analytics?.overallFeedback
                   )}
@@ -245,7 +245,7 @@ function CallInfo({
               <div className="font-medium">
                 <span className="font-normal">Feedback: </span>
                 {analytics?.communication.feedback === undefined ? (
-                  <Skeleton className="h-[20px] w-[200px]" />
+                  <Skeleton className="h-5 w-50" />
                 ) : (
                   analytics?.communication.feedback
                 )}
@@ -258,7 +258,7 @@ function CallInfo({
                 <p className="my-auto">User Sentiment: </p>
                 <p className="my-auto font-medium">
                   {callData?.call_analysis?.user_sentiment === undefined ? (
-                    <Skeleton className="h-[20px] w-[200px]" />
+                    <Skeleton className="h-5 w-50" />
                   ) : (
                     callData?.call_analysis?.user_sentiment
                   )}
@@ -282,7 +282,7 @@ function CallInfo({
                 <div className="font-medium">
                   <span className="font-normal">Call Summary: </span>
                   {callData?.call_analysis?.call_summary === undefined ? (
-                    <Skeleton className="h-[20px] w-[200px]" />
+                    <Skeleton className="h-5 w-50" />
                   ) : (
                     callData?.call_analysis?.call_summary
                   )}
@@ -296,7 +296,7 @@ function CallInfo({
         </div>
       </div>
       {analytics?.questionSummaries && analytics.questionSummaries.length > 0 && (
-        <div className="my-3 min-h-[120px] rounded-xl bg-muted p-4 px-5">
+        <div className="my-3 min-h-30 rounded-xl bg-muted p-4 px-5">
           <p className="my-2 mb-4 font-semibold">Question Summary</p>
           <ScrollArea className="scrollbar-thin mt-3 h-72 overflow-y-scroll whitespace-pre-line rounded-md px-2 py-3 text-sm leading-6">
             {analytics?.questionSummaries.map((qs, index) => (
@@ -310,7 +310,7 @@ function CallInfo({
           </ScrollArea>
         </div>
       )}
-      <div className="max-h-[500px] min-h-[150px] rounded-xl bg-muted p-4 px-5">
+      <div className="max-h-125 min-h-37.5 rounded-xl bg-muted p-4 px-5">
         <p className="my-2 mb-4 font-semibold">Transcript</p>
         <ScrollArea className="scrollbar-thin h-96 overflow-y-auto whitespace-pre-line rounded-lg px-2 text-sm">
           <div

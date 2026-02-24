@@ -48,7 +48,7 @@ function InterviewCard({
       setTimeout(() => {
         setCopied(false);
       }, 2000);
-    } catch (err) {
+    } catch (_err) {
       toast.error("Could not copy link. Please copy it manually.", { position: "bottom-right" });
     }
   };

@@ -1,5 +1,3 @@
-import React from "react";
-
 function LoaderWithText() {
   return (
     <div className="relative flex h-screen flex-col items-center justify-center">

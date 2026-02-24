@@ -16,12 +16,17 @@ export const getAllInterviewers = async () => {
   }
 };
 
-export const createInterviewer = async (payload: any) => {
+export const createInterviewer = async (payload: typeof interviewer.$inferInsert) => {
   try {
     const existing = await db
       .select()
       .from(interviewer)
-      .where(and(eq(interviewer.name, payload.name), eq(interviewer.agentId, payload.agentId)))
+      .where(
+        and(
+          eq(interviewer.name, payload.name),
+          payload.agentId != null ? eq(interviewer.agentId, payload.agentId) : undefined,
+        )
+      )
       .limit(1);
 
     if (existing.length > 0) {
