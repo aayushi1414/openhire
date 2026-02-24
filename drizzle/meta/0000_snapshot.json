@@ -1,5 +1,5 @@
 {
-  "id": "d0a2c0a2-8f80-4b8b-b4f9-76367b023754",
+  "id": "0179d0f2-7a67-4bda-a455-de9cd272e665",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -777,17 +777,7 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {
-    "public.plan": {
-      "name": "plan",
-      "schema": "public",
-      "values": [
-        "free",
-        "pro",
-        "free_trial_over"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {},
   "sequences": {},
   "roles": {},

@@ -1,4 +1,3 @@
-CREATE TYPE "public"."plan" AS ENUM('free', 'pro', 'free_trial_over');--> statement-breakpoint
 CREATE TABLE "feedback" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
