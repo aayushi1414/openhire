@@ -1,7 +1,7 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
-import { Clock, Pencil, UserCheck, Users } from "lucide-react";
+import { Clock, Pencil, Trash2, UserCheck, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { updateInterview } from "@/actions/interviews";
 import { getResponseByCallIdAction, updateResponse } from "@/actions/responses";
 import CandidateResponseDialog from "@/components/dashboard/interview/candidate/candidate-response-dialog";
 import MainInterviewDialog from "@/components/dashboard/interview/create/main-interview-dialog";
+import DeleteInterviewDialog from "@/components/dashboard/interview/detail/delete-interview-dialog";
 import InterviewDetailSearch from "@/components/dashboard/interview/detail/interview-detail-search";
 import StatusCard from "@/components/dashboard/interview/detail/status-card";
 import type { BreadcrumbOptions } from "@/components/ui/app-breadcrumbs";
@@ -64,6 +65,7 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
   const [selectedResponse, setSelectedResponse] = useState<InterviewDetailTableResponse | null>(
     null,
   );
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const breadcrumbs: BreadcrumbOptions[] = [
     {
@@ -136,7 +138,13 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
   );
 
   const filteredResponses = data
-    .filter((r) => filterStatus === "ALL" || r.candidateStatus === filterStatus)
+    .filter((r) => {
+      if (filterStatus === "ALL") return true;
+      if (filterStatus === CandidateStatus.NO_STATUS) {
+        return !r.candidateStatus || r.candidateStatus === CandidateStatus.NO_STATUS;
+      }
+      return r.candidateStatus === filterStatus;
+    })
     .filter((r) => {
       if (!activeSearch) {
         return true;
@@ -149,21 +157,16 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
       {
         header: "Name",
         accessorKey: "name",
-        size: 120,
+        size: 150,
       },
       {
         header: "Email",
         accessorKey: "email",
-        size: 140,
-        meta: {
-          headerAlign: "center",
-          bodyAlign: "center",
-        },
+        size: 200,
       },
       {
         header: "Overall Score",
         accessorKey: "analytics.overallScore",
-        size: 90,
         cell: ({ row }) => {
           const score = row.original.analytics?.overallScore;
           return score != null ? (
@@ -173,14 +176,13 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
           );
         },
         meta: {
-          bodyAlign: "center",
           headerAlign: "center",
+          bodyAlign: "center",
         },
       },
       {
         header: "Communication",
         accessorKey: "analytics.communication.score",
-        size: 90,
         cell: ({ row }) => {
           const score = row.original.analytics?.communication?.score;
           return score != null ? (
@@ -190,6 +192,7 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
           );
         },
         meta: {
+          headerAlign: "center",
           bodyAlign: "center",
         },
       },
@@ -197,7 +200,6 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
       {
         header: "Date",
         accessorKey: "createdAt",
-        size: 140,
         cell: ({ row }) => formatTimestampToDateHHMM(String(row.original.createdAt)),
         meta: {
           headerAlign: "center",
@@ -207,7 +209,6 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
       {
         header: "Duration",
         accessorKey: "duration",
-        size: 90,
         cell: ({ row }) => convertSecondstoMMSS(row.original.duration ?? 0),
         meta: {
           headerAlign: "center",
@@ -217,7 +218,7 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
       {
         header: "Status",
         accessorKey: "candidateStatus",
-        size: 110,
+        size: 100,
         cell: ({ row }) => {
           const status = row.original.candidateStatus ?? CandidateStatus.NO_STATUS;
           const label =
@@ -247,7 +248,6 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
       {
         id: "actions",
         header: "Details",
-        size: 120,
         cell: ({ row }) => (
           <div className="flex justify-center gap-2">
             <Button
@@ -301,6 +301,17 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
             <span>Edit</span>
             <Pencil className="text-primary" />
           </Button>
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={() => setIsDeleteModalOpen(true)}
+            title="Delete interview"
+            className="border-destructive bg-destructive/10 text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            <span>Delete</span>
+            <Trash2 className="text-destructive" />
+          </Button>
+          {/*  */}
         </div>
       </div>
 
@@ -364,6 +375,16 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
           analytics={selectedAnalytics}
           responseData={selectedResponse}
           interviewId={interview.id}
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <DeleteInterviewDialog
+          open={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          interviewId={interview.id}
+          interviewName={interview.name}
+          onDeleted={() => router.push("/")}
         />
       )}
 
