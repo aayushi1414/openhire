@@ -18,16 +18,14 @@ Open-source AI interviewing platform. Self-hosted.
 
 ## Tech Stack
 
-- [Next.js 16](https://nextjs.org/) (App Router)
-- [React 19](https://react.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
-- [Drizzle ORM](https://orm.drizzle.team/) + [Neon](https://neon.tech/) (Postgres)
-- [Better Auth](https://www.better-auth.com/)
-- [Retell AI](https://www.retellai.com/)
-- [OpenAI](https://openai.com/) + [LangChain](https://www.langchain.com/)
-- [pnpm](https://pnpm.io/)
-
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4 + shadcn/ui
+- Drizzle ORM + Neon (Postgres) / PostgreSQL
+- Better Auth
+- Retell AI
+- OpenAI + LangChain
 
 ## Documentation
 
