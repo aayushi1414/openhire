@@ -25,7 +25,7 @@ export const createInterviewer = async (payload: typeof interviewer.$inferInsert
         and(
           eq(interviewer.name, payload.name),
           payload.agentId != null ? eq(interviewer.agentId, payload.agentId) : undefined,
-        )
+        ),
       )
       .limit(1);
 
