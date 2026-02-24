@@ -2,8 +2,6 @@
 
 ## Suite 1: Authentication · TC-001 – TC-014
 
----
-
 ### TC-001 · P0
 **Sign-in page renders with branding, email/password fields, Login button, and Sign up link.**
 
