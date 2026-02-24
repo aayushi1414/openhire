@@ -7,9 +7,6 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
   emailAndPassword: { enabled: true },
   plugins: [nextCookies()],
-  session: {
-    cookieCache: { enabled: true, maxAge: 60 * 5 },
-  },
 });
 
 export type Session = typeof auth.$Infer.Session;
