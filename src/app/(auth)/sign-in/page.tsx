@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import MiniLoader from "@/components/loaders/mini-loader/miniLoader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -114,6 +115,7 @@ export default function SignInPage() {
                   />
                   <Field>
                     <Button type="submit" disabled={!isValid || isSubmitting}>
+                      {isSubmitting && <MiniLoader />}
                       Login
                     </Button>
                     <FieldDescription className="text-center">

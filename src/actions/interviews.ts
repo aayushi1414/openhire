@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { interview } from "@/lib/db/schema";
+import { feedback, interview, response } from "@/lib/db/schema";
 import type { Question } from "@/types/interview";
 
 interface CreateInterviewPayload {
@@ -90,7 +90,10 @@ export const updateInterview = async (id: string, payload: UpdateInterviewPayloa
 
 export const deleteInterview = async (id: string) => {
   try {
-    await db.delete(interview).where(eq(interview.id, id)).returning();
+    await db.delete(response).where(eq(response.interviewId, id));
+    await db.delete(feedback).where(eq(feedback.interviewId, id));
+    await db.delete(interview).where(eq(interview.id, id));
+    revalidatePath("/");
     return { success: true as const };
   } catch (error) {
     console.log(error);

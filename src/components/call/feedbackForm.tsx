@@ -42,7 +42,7 @@ export function FeedbackForm({ onSubmit, email }: FeedbackFormProps) {
   const { control, handleSubmit, setValue, watch, formState } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      satisfaction: SatisfactionLevel.Moderate,
+      satisfaction: SatisfactionLevel.Positive,
       feedback: "",
     },
   });
