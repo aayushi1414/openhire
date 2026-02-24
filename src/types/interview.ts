@@ -26,9 +26,8 @@ export interface InterviewDetails {
   id: string;
   createdAt: Date;
   quotes: Quote[];
-  details: any;
+  details: Record<string, unknown> | null;
   isActive: boolean;
-  themeColor: string;
   logoUrl: string;
   respondents: string[];
   readableSlug: string;

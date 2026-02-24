@@ -7,12 +7,12 @@ export interface InterviewDetailTableResponse {
   interviewerId: string;
   duration: number;
   callId: string;
-  details: any;
+  details: CallData | null;
   isAnalysed: boolean;
   email: string;
   isEnded: boolean;
   isViewed: boolean;
-  analytics: any;
+  analytics: Analytics | null;
   candidateStatus: string;
   tabSwitchCount: number;
 }

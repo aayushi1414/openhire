@@ -4,7 +4,8 @@ import { getAllInterviewers } from "@/lib/data/interviewers";
 import { getInterviewById } from "@/lib/data/interviews";
 import { getAllResponses } from "@/lib/data/responses";
 import { CandidateStatus } from "@/lib/enum";
-import type { Response } from "@/types/response";
+import type { Interview } from "@/types/interview";
+import type { InterviewDetailTableResponse, Response } from "@/types/response";
 
 interface Props {
   params: Promise<{
@@ -63,8 +64,8 @@ export default async function InterviewPage({ params }: Props) {
 
   return (
     <InterviewDetailClient
-      interview={interview as any}
-      data={responses as any}
+      interview={interview as unknown as Interview}
+      data={responses as unknown as InterviewDetailTableResponse[]}
       stats={stats}
       interviewers={interviewers}
     />

@@ -1,8 +1,8 @@
 /* eslint-disable react/display-name */
-import React from "react";
+import type { ComponentType, ReactNode } from "react";
 
-const compose = (providers: any[]) =>
-  providers.reduce((Prev, Curr) => ({ children }: any) => (
+const compose = (providers: ComponentType<{ children: ReactNode }>[]) =>
+  providers.reduce((Prev, Curr) => ({ children }: { children: ReactNode }) => (
     <Prev>
       <Curr>{children}</Curr>
     </Prev>

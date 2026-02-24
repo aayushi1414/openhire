@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const { event, call } = body as { event: string; call: any };
+  const { event, call } = body as { event: string; call: { call_id: string } };
 
   switch (event) {
     case "call_started":
