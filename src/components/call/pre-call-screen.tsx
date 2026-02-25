@@ -5,13 +5,13 @@ import { AlarmClockIcon } from "lucide-react";
 import Image from "next/image";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
+import MiniLoader from "@/components/loaders/mini-loader/miniLoader";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Field, FieldContent, FieldError, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { Interview } from "@/types/interview";
-import MiniLoader from "../loaders/mini-loader/miniLoader";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
-import { ConfirmDialog } from "./confirm-dialog";
+import ConfirmDialog from "./confirm-dialog";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -30,8 +30,8 @@ interface PreCallScreenProps {
   onExit: () => void;
 }
 
-export function PreCallScreen(Props: PreCallScreenProps) {
-  const { interview, isLoading, interviewTimeDuration, interviewerImg, onStart, onExit } = Props;
+export default function PreCallScreen(props: PreCallScreenProps) {
+  const { interview, isLoading, interviewTimeDuration, interviewerImg, onStart, onExit } = props;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

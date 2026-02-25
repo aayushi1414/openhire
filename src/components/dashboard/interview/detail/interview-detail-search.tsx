@@ -29,14 +29,15 @@ interface InterviewDetailSearchProps {
   onClearSearch: () => void;
 }
 
-export default function InterviewDetailSearch({
-  filterStatus,
-  onFilterStatusChange,
-  searchValue,
-  onSearchValueChange,
-  onSearch,
-  onClearSearch,
-}: InterviewDetailSearchProps) {
+export default function InterviewDetailSearch(props: InterviewDetailSearchProps) {
+  const {
+    filterStatus,
+    onFilterStatusChange,
+    searchValue,
+    onSearchValueChange,
+    onSearch,
+    onClearSearch,
+  } = props;
   const hasActiveFilter = filterStatus !== "ALL" || searchValue;
   const selectedLabel = STATUS_OPTIONS.find((o) => o.value === filterStatus)?.label ?? "All";
 

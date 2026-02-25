@@ -6,21 +6,16 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { parsePdf } from "@/actions/pdf";
 
-type Props = {
+interface FileUploadProps {
   isUploaded: boolean;
   setIsUploaded: (isUploaded: boolean) => void;
   fileName: string;
   setFileName: (fileName: string) => void;
   setUploadedDocumentContext: (context: string) => void;
-};
+}
 
-function FileUpload({
-  isUploaded,
-  setIsUploaded,
-  fileName,
-  setFileName,
-  setUploadedDocumentContext,
-}: Props) {
+export default function FileUpload(props: FileUploadProps) {
+  const { isUploaded, setIsUploaded, fileName, setFileName, setUploadedDocumentContext } = props;
   const [_uploading, setUploading] = useState(false);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -100,5 +95,3 @@ function FileUpload({
     </div>
   );
 }
-
-export default FileUpload;

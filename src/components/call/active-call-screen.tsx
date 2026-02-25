@@ -3,10 +3,10 @@
 import { AlarmClockMinusIcon, XCircleIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import type { Interview } from "@/types/interview";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
-import { ConfirmDialog } from "./confirm-dialog";
+import ConfirmDialog from "./confirm-dialog";
 
 interface ActiveCallScreenProps {
   interview: Interview;
@@ -21,7 +21,7 @@ interface ActiveCallScreenProps {
   onEndInterview: () => void;
 }
 
-export function ActiveCallScreen(Props: ActiveCallScreenProps) {
+export default function ActiveCallScreen(props: ActiveCallScreenProps) {
   const {
     interview,
     isLoading,
@@ -33,7 +33,7 @@ export function ActiveCallScreen(Props: ActiveCallScreenProps) {
     remainingSeconds,
     userName,
     onEndInterview,
-  } = Props;
+  } = props;
 
   const initials = userName
     .split(" ")
