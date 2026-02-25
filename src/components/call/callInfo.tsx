@@ -7,24 +7,24 @@ import type { ReactNode } from "react";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { deleteResponse } from "@/actions/responses";
-import { CandidateStatusDropdown } from "@/components/call/candidate-status-dropdown";
-import { DeleteResponseDialog } from "@/components/call/delete-response-dialog";
 import QuestionAnswerCard from "@/components/dashboard/interview/candidate/question-answer-card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Analytics, CallData } from "@/types/response";
+import type { Analytics, CallData, FeedbackData } from "@/types/response";
 import { Badge } from "../ui/badge";
+import { CandidateStatusDropdown } from "./reviewer/candidate-status-dropdown";
+import { DeleteResponseDialog } from "./reviewer/delete-response-dialog";
 
-type CircularProgressProps = {
+interface CircularProgressProps {
   value?: number;
   maxValue?: number;
   minValue?: number;
   showValueLabel?: boolean;
   valueLabel?: ReactNode;
   classNames?: Record<string, string>;
-};
+}
 
 function CircularProgress({
   value = 0,
@@ -70,7 +70,7 @@ function CircularProgress({
   );
 }
 
-type CallProps = {
+interface CallProps {
   call_id: string;
   callData: CallData | null;
   analytics: Analytics | null;
@@ -80,19 +80,25 @@ type CallProps = {
   interviewId: string;
   tabSwitchCount?: number;
   onClose?: () => void;
-};
+  feedbackData?: FeedbackData | null;
+}
 
-function CallInfo({
-  call_id,
-  callData,
-  analytics,
-  name,
-  email,
-  candidateStatus: initialCandidateStatus,
-  interviewId,
-  tabSwitchCount,
-  onClose,
-}: CallProps) {
+function CallInfo(props: CallProps) {
+  const {
+    call_id,
+    callData,
+    analytics,
+    name,
+    email,
+    candidateStatus: initialCandidateStatus,
+    interviewId,
+    tabSwitchCount,
+    onClose,
+    feedbackData,
+  } = props;
+
+  console.log(feedbackData);
+
   const [isDeleting, startDeleteTransition] = useTransition();
   const router = useRouter();
   const [transcriptHtml, setTranscriptHtml] = useState("");
@@ -295,6 +301,7 @@ function CallInfo({
           )}
         </div>
       </div>
+
       {analytics?.questionSummaries && analytics.questionSummaries.length > 0 && (
         <div className="my-3 min-h-30 rounded-xl bg-muted p-4 px-5">
           <p className="my-2 mb-4 font-semibold">Question Summary</p>
@@ -320,6 +327,32 @@ function CallInfo({
           />
         </ScrollArea>
       </div>
+
+      {feedbackData && (feedbackData.satisfaction !== null || feedbackData.feedback) && (
+        <div className="my-3 min-h-30 rounded-xl bg-muted p-4 px-5">
+          <p className="my-2 font-semibold">Candidate Feedback</p>
+          <div className="flex flex-col gap-2 rounded-lg bg-card p-4 text-sm">
+            {feedbackData.satisfaction !== null && (
+              <p className="font-semibold">
+                Satisfaction:{" "}
+                <span className="font-normal">
+                  {feedbackData.satisfaction === 0
+                    ? "😀 Positive"
+                    : feedbackData.satisfaction === 1
+                      ? "😐 Moderate"
+                      : "😔 Negative"}
+                </span>
+              </p>
+            )}
+            {feedbackData.feedback && (
+              <p className="font-semibold">
+                Comment: {""}
+                <span className="font-normal">{feedbackData.feedback}</span>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
