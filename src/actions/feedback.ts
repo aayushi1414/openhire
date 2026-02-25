@@ -30,12 +30,7 @@ export const getFeedbackByInterviewIdAndEmail = async (
   const [row] = await db
     .select()
     .from(feedback)
-    .where(
-      and(
-        eq(feedback.interviewId, interviewId),
-        eq(feedback.email, email),
-      ),
-    )
+    .where(and(eq(feedback.interviewId, interviewId), eq(feedback.email, email)))
     .limit(1);
 
   if (!row) return null;

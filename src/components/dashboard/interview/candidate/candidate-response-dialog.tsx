@@ -3,7 +3,12 @@
 import CallInfo from "@/components/call/reviewer/call-info";
 import LoaderWithText from "@/components/loaders/loader-with-text/loaderWithText";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { Analytics, CallData, FeedbackData, InterviewDetailTableResponse } from "@/types/response";
+import type {
+  Analytics,
+  CallData,
+  FeedbackData,
+  InterviewDetailTableResponse,
+} from "@/types/response";
 
 interface CandidateResponseDialogProps {
   open: boolean;
