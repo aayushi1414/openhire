@@ -2,83 +2,139 @@
 
 Two options depending on your setup:
 
-- **[Docker](#option-1--docker)** — self-host on your own server
-- **[Vercel + Neon](#option-2--vercel--neon)** — fully managed, no server needed
+- [Deploy with Vercel](#deploy-with-vercel) — fully managed, no server needed
+- [Deploy with Docker](#deploy-with-docker) — self-host on your own server
 
 ---
 
-## Option 1 — Docker
+## Deploy with Vercel
 
-Best if you want to run everything on your own server.
+### Prerequisites
 
-**1. Clone the repo**
+Make sure you have:
+
+- A [GitHub](https://github.com/) account
+- [Retell AI](https://www.retellai.com/) API key
+- [OpenAI](https://platform.openai.com/) API key
+
+---
+
+### Step 1 — Fork the repo
+
+Fork [brijeshmarch16/openhire](https://github.com/brijeshmarch16/openhire) on GitHub.
+
+### Step 2 — Deploy to Vercel
+
+Go to [vercel.com](https://vercel.com/), click **Add New Project**, and import your forked repo.
+
+### Step 3 — Add a Neon Postgres database
+
+In your Vercel project, go to the **Storage** tab, click **Create Database**, and select **Neon Postgres**. Vercel creates the database and automatically sets `DATABASE_URL` in your environment variables.
+
+### Step 4 — Add environment variables
+
+In your Vercel project, go to **Settings → Environment Variables** and add:
+
+| Variable | What to put here |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Your Vercel URL (e.g. `https://your-app.vercel.app`) |
+| `BETTER_AUTH_URL` | Your Vercel URL |
+| `BETTER_AUTH_SECRET` | Run `openssl rand -base64 32` and paste the output |
+| `RETELL_API_KEY` | From [Retell AI dashboard](https://dashboard.retellai.com/apiKey) |
+| `OPENAI_API_KEY` | From [OpenAI platform](https://platform.openai.com/api-keys) |
+
+### Step 5 — Set the build command
+
+In your Vercel project, go to **Settings → Build & Development Settings** and set the **Build Command** to:
+
+```bash
+pnpm db:migrate && pnpm db:seed && pnpm build
+```
+
+This runs migrations and seeds the database automatically on every deploy. The seed script is safe to run multiple times — it skips if data already exists.
+
+### Step 6 — Redeploy
+
+Trigger a redeployment in Vercel — your app will go live.
+
+---
+
+## Deploy with Docker
+
+### Prerequisites
+
+Make sure you have:
+
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
+- [Node.js](https://nodejs.org/) (v18 or higher) and [pnpm](https://pnpm.io/installation) — needed to run migrations locally before starting the container
+- A PostgreSQL database — self-hosted or [Neon](https://neon.tech/), etc.
+- [Retell AI](https://www.retellai.com/) API key
+- [OpenAI](https://platform.openai.com/) API key
+
+---
+
+### Step 1 — Clone the repo
 
 ```bash
 git clone https://github.com/brijeshmarch16/openhire.git
 cd openhire
 ```
 
-**2. Set up environment variables**
+### Step 2 — Install dependencies
+
+```bash
+pnpm install
+```
+
+### Step 3 — Enable standalone output
+
+Open `next.config.js` and uncomment the `output` line:
+
+```js
+const nextConfig = {
+  output: "standalone",
+  // ...
+};
+```
+
+This tells Next.js to produce a self-contained build that Docker can run without `node_modules`.
+
+### Step 4 — Configure environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-Fill in your `.env` — use the [env var table](./run-locally.md#setup) in the run-locally guide as reference. Set `DATABASE_URL` to an external Postgres instance (e.g. [Neon](https://neon.tech/)) — Docker does not include a bundled database.
+Open `.env` and fill in each value:
 
-**3. Run database migrations**
-
-```bash
-pnpm db:migrate
-```
-
-**4. Start the app**
-
-```bash
-docker-compose up -d
-```
-
-The app will be running at `http://your-server-ip:3000`.
-
----
-
-## Option 2 — Vercel + Neon
-
-Best if you want a fast, zero-config deployment with no server to manage.
-
-**1. Fork the repo**
-
-Fork [brijeshmarch16/openhire](https://github.com/brijeshmarch16/openhire) on GitHub.
-
-**2. Create a Neon database**
-
-Sign up at [neon.tech](https://neon.tech/), create a new project, and copy the connection string.
-
-**3. Deploy to Vercel**
-
-Go to [vercel.com](https://vercel.com/), click **Add New Project**, and import your forked repo. Vercel detects Next.js automatically.
-
-**4. Add environment variables**
-
-In your Vercel project, go to **Settings → Environment Variables** and add:
-
-| Variable | Value |
-|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Your Vercel URL (e.g. `https://your-app.vercel.app`) |
-| `BETTER_AUTH_URL` | Your Vercel URL |
+| Variable | What to put here |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | `http://your-server-ip:3000` |
+| `BETTER_AUTH_URL` | `http://your-server-ip:3000` |
 | `BETTER_AUTH_SECRET` | Run `openssl rand -base64 32` and paste the output |
-| `DATABASE_URL` | Your Neon connection string |
+| `DATABASE_URL` | Your Postgres connection string |
 | `RETELL_API_KEY` | From [Retell AI dashboard](https://dashboard.retellai.com/apiKey) |
 | `OPENAI_API_KEY` | From [OpenAI platform](https://platform.openai.com/api-keys) |
 
-**5. Run database migrations**
-
-The easiest way is to run migrations from your local machine against the Neon database. With your `.env` pointing at Neon:
+### Step 5 — Run database migrations
 
 ```bash
 pnpm db:migrate
 ```
 
-**6. Redeploy**
+### Step 6 — Seed the database
 
-Trigger a redeployment in Vercel — your app will go live with all env vars applied.
+```bash
+pnpm db:seed
+```
+
+This creates the default interviewers needed for the app.
+
+### Step 7 — Start the app
+
+```bash
+docker-compose up --build -d
+```
+
+Open `http://your-server-ip:3000` — you're good to go.
+
