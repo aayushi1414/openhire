@@ -38,7 +38,7 @@ interface FeedbackFormProps {
   email: string;
 }
 
-export function FeedbackForm({ onSubmit, email }: FeedbackFormProps) {
+export default function FeedbackForm({ onSubmit, email }: FeedbackFormProps) {
   const { control, handleSubmit, setValue, watch, formState } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {

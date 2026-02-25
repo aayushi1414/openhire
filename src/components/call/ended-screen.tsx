@@ -8,9 +8,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import type { FeedbackData } from "@/types/response";
-import { Button } from "../ui/button";
-import { FeedbackForm } from "./feedbackForm";
+import FeedbackForm from "./feedback-form";
 import { ScreenStatusCard } from "./screen-status-card";
 
 interface EndedScreenProps {
@@ -22,14 +22,15 @@ interface EndedScreenProps {
   onFeedbackSubmit: (data: Omit<FeedbackData, "interview_id">) => void;
 }
 
-export function EndedScreen({
-  isStarted,
-  email,
-  isFeedbackSubmitted,
-  isDialogOpen,
-  onDialogOpenChange,
-  onFeedbackSubmit,
-}: EndedScreenProps) {
+export default function EndedScreen(props: EndedScreenProps) {
+  const {
+    isStarted,
+    email,
+    isFeedbackSubmitted,
+    isDialogOpen,
+    onDialogOpenChange,
+    onFeedbackSubmit,
+  } = props;
   return (
     <ScreenStatusCard
       title={

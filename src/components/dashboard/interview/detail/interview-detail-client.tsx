@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { analyzeCall, getCallData } from "@/actions/call";
+import { getFeedbackByInterviewIdAndEmail } from "@/actions/feedback";
 import { updateInterview } from "@/actions/interviews";
 import { getResponseByCallIdAction, updateResponse } from "@/actions/responses";
-import CandidateResponseDialog from "@/components/dashboard/interview/candidate/candidate-response-dialog";
+import CandidateResponseDialog from "@/components/dashboard/interview/candidate-response";
 import MainInterviewDialog from "@/components/dashboard/interview/create/main-interview-dialog";
 import DeleteInterviewDialog from "@/components/dashboard/interview/detail/delete-interview-dialog";
 import InterviewDetailSearch from "@/components/dashboard/interview/detail/interview-detail-search";
@@ -23,7 +24,12 @@ import { CandidateStatus } from "@/lib/enum";
 import { convertSecondstoMMSS, formatTimestampToDateHHMM } from "@/lib/utils";
 import type { Interview } from "@/types/interview";
 import type { Interviewer } from "@/types/interviewer";
-import type { Analytics, CallData, InterviewDetailTableResponse } from "@/types/response";
+import type {
+  Analytics,
+  CallData,
+  FeedbackData,
+  InterviewDetailTableResponse,
+} from "@/types/response";
 
 interface Stats {
   avgDuration: number;
@@ -46,8 +52,8 @@ const STATUS_BADGE: Record<string, string> = {
   [CandidateStatus.NO_STATUS]: "bg-gray-100 text-gray-500 border-gray-200",
 };
 
-export default function InterviewDetailClient(Props: InterviewDetailsClientsProps) {
-  const { interview, data, stats, interviewers } = Props;
+export default function InterviewDetailClient(props: InterviewDetailsClientsProps) {
+  const { interview, data, stats, interviewers } = props;
   const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isActive, setIsActive] = useState<boolean>(interview.isActive ?? true);
@@ -65,6 +71,7 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
   const [selectedResponse, setSelectedResponse] = useState<InterviewDetailTableResponse | null>(
     null,
   );
+  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackData | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const breadcrumbs: BreadcrumbOptions[] = [
@@ -117,14 +124,16 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
       setSelectedCallData(null);
       setSelectedAnalytics(null);
       setSelectedResponse(null);
+      setSelectedFeedback(null);
 
       if (!response.isViewed) {
         updateResponse({ isViewed: true }, response.callId).then(() => router.refresh());
       }
 
-      const [callResult, respData] = await Promise.all([
+      const [callResult, respData, feedbackResult] = await Promise.all([
         getCallData(response.callId),
         getResponseByCallIdAction(response.callId),
+        getFeedbackByInterviewIdAndEmail(interview.id, response.email),
       ]);
 
       if (callResult.success) {
@@ -132,9 +141,10 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
         setSelectedAnalytics(callResult.data?.analytics ?? null);
       }
       setSelectedResponse(respData);
+      setSelectedFeedback(feedbackResult ?? null);
       setIsResponseLoading(false);
     },
-    [router],
+    [router, interview.id],
   );
 
   const filteredResponses = data
@@ -375,6 +385,7 @@ export default function InterviewDetailClient(Props: InterviewDetailsClientsProp
           analytics={selectedAnalytics}
           responseData={selectedResponse}
           interviewId={interview.id}
+          feedbackData={selectedFeedback}
         />
       )}
 

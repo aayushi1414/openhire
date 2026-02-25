@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 
-interface Props {
+interface InterviewCardProps {
   name: string | null;
   id: string;
   readableSlug: string | null;
@@ -18,14 +18,8 @@ interface Props {
   isActive: boolean;
 }
 
-function InterviewCard({
-  name,
-  id,
-  readableSlug,
-  interviewerImage,
-  responseCount,
-  isActive,
-}: Props) {
+export default function InterviewCard(props: InterviewCardProps) {
+  const { name, id, readableSlug, interviewerImage, responseCount, isActive } = props;
   const [copied, setCopied] = useState(false);
 
   const buildInterviewUrl = () => {
@@ -117,5 +111,3 @@ function InterviewCard({
     </Link>
   );
 }
-
-export default InterviewCard;

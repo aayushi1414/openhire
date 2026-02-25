@@ -8,12 +8,13 @@ interface ScreenStatusCardProps {
   children?: React.ReactNode;
 }
 
-export function ScreenStatusCard({
-  icon = <CheckCircleIcon className="mx-auto my-4 h-8 w-8 text-primary" />,
-  title,
-  description,
-  children,
-}: ScreenStatusCardProps) {
+export function ScreenStatusCard(props: ScreenStatusCardProps) {
+  const {
+    icon = <CheckCircleIcon className="mx-auto my-4 h-8 w-8 text-primary" />,
+    title,
+    description,
+    children,
+  } = props;
   return (
     <div className="mx-auto w-full max-w-md">
       <div className="rounded-md border border-primary/20 bg-muted">
