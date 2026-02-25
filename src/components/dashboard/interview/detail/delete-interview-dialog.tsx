@@ -22,13 +22,8 @@ interface DeleteInterviewDialogProps {
   onDeleted: () => void;
 }
 
-export default function DeleteInterviewDialog({
-  open,
-  onClose,
-  interviewId,
-  interviewName,
-  onDeleted,
-}: DeleteInterviewDialogProps) {
+export default function DeleteInterviewDialog(props: DeleteInterviewDialogProps) {
+  const { open, onClose, interviewId, interviewName, onDeleted } = props;
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {

@@ -20,8 +20,8 @@ const depthLevels = [
   { level: 3, label: "High" },
 ] as const;
 
-export default function InterviewQuestionCard(Props: InterviewQuestionCardProps) {
-  const { questionNumber, questionData, control, index, onDelete } = Props;
+export default function InterviewQuestionCard(props: InterviewQuestionCardProps) {
+  const { questionNumber, questionData, control, index, onDelete } = props;
 
   return (
     <Card className="shadow-sm">

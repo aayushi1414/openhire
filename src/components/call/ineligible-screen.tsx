@@ -1,6 +1,6 @@
 import { ScreenStatusCard } from "./screen-status-card";
 
-export function IneligibleScreen() {
+export default function IneligibleScreen() {
   return (
     <ScreenStatusCard
       title="You have already responded in this interview or you are not eligible to respond. Thank you!"

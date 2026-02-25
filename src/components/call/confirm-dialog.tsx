@@ -20,14 +20,15 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
 }
 
-export function ConfirmDialog({
-  trigger,
-  title,
-  description,
-  cancelText = "Cancel",
-  confirmText = "Continue",
-  onConfirm,
-}: ConfirmDialogProps) {
+export default function ConfirmDialog(props: ConfirmDialogProps) {
+  const {
+    trigger,
+    title,
+    description,
+    cancelText = "Cancel",
+    confirmText = "Continue",
+    onConfirm,
+  } = props;
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>

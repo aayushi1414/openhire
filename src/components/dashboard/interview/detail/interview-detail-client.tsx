@@ -9,7 +9,7 @@ import { analyzeCall, getCallData } from "@/actions/call";
 import { getFeedbackByInterviewIdAndEmail } from "@/actions/feedback";
 import { updateInterview } from "@/actions/interviews";
 import { getResponseByCallIdAction, updateResponse } from "@/actions/responses";
-import CandidateResponseDialog from "@/components/dashboard/interview/candidate/candidate-response-dialog";
+import CandidateResponseDialog from "@/components/dashboard/interview/candidate-response";
 import MainInterviewDialog from "@/components/dashboard/interview/create/main-interview-dialog";
 import DeleteInterviewDialog from "@/components/dashboard/interview/detail/delete-interview-dialog";
 import InterviewDetailSearch from "@/components/dashboard/interview/detail/interview-detail-search";
@@ -52,8 +52,8 @@ const STATUS_BADGE: Record<string, string> = {
   [CandidateStatus.NO_STATUS]: "bg-gray-100 text-gray-500 border-gray-200",
 };
 
-export default function InterviewDetailClient(Props: InterviewDetailsClientsProps) {
-  const { interview, data, stats, interviewers } = Props;
+export default function InterviewDetailClient(props: InterviewDetailsClientsProps) {
+  const { interview, data, stats, interviewers } = props;
   const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isActive, setIsActive] = useState<boolean>(interview.isActive ?? true);
