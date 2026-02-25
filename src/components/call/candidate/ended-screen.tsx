@@ -8,9 +8,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import type { FeedbackData } from "@/types/response";
-import { Button } from "../ui/button";
-import { FeedbackForm } from "./feedbackForm";
+import { FeedbackForm } from "./feedback-form";
 import { ScreenStatusCard } from "./screen-status-card";
 
 interface EndedScreenProps {

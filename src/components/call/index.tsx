@@ -10,11 +10,11 @@ import { useCallTimer } from "@/hooks/use-call-timer";
 import { useRetellClient } from "@/hooks/use-retell-client";
 import type { Interview } from "@/types/interview";
 import type { FeedbackData } from "@/types/response";
-import { ActiveCallScreen } from "./active-call-screen";
-import { EndedScreen } from "./ended-screen";
-import { IneligibleScreen } from "./ineligible-screen";
-import { PreCallScreen } from "./pre-call-screen";
-import { TabSwitchWarning, useTabSwitchPrevention } from "./tabSwitchPrevention";
+import { ActiveCallScreen } from "./candidate/active-call-screen";
+import { EndedScreen } from "./candidate/ended-screen";
+import { IneligibleScreen } from "./candidate/ineligible-screen";
+import { PreCallScreen } from "./candidate/pre-call-screen";
+import { TabSwitchWarning, useTabSwitchPrevention } from "./candidate/tab-switch-prevention";
 
 interface InterviewProps {
   interview: Interview;

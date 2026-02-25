@@ -8,9 +8,9 @@ import { z } from "zod";
 import { Field, FieldContent, FieldError, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { Interview } from "@/types/interview";
-import MiniLoader from "../loaders/mini-loader/miniLoader";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
+import MiniLoader from "@/components/loaders/mini-loader/miniLoader";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { ConfirmDialog } from "./confirm-dialog";
 
 const formSchema = z.object({

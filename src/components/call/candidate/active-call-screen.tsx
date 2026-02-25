@@ -4,8 +4,8 @@ import { AlarmClockMinusIcon, XCircleIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import type { Interview } from "@/types/interview";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { ConfirmDialog } from "./confirm-dialog";
 
 interface ActiveCallScreenProps {

@@ -1,9 +1,9 @@
 "use client";
 
-import CallInfo from "@/components/call/callInfo";
+import CallInfo from "@/components/call/reviewer/call-info";
 import LoaderWithText from "@/components/loaders/loader-with-text/loaderWithText";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { Analytics, CallData, InterviewDetailTableResponse } from "@/types/response";
+import type { Analytics, CallData, FeedbackData, InterviewDetailTableResponse } from "@/types/response";
 
 interface CandidateResponseDialogProps {
   open: boolean;
@@ -14,6 +14,7 @@ interface CandidateResponseDialogProps {
   analytics: Analytics | null;
   responseData: InterviewDetailTableResponse | null;
   interviewId: string;
+  feedbackData: FeedbackData | null;
 }
 
 export default function CandidateResponseDialog({
@@ -25,6 +26,7 @@ export default function CandidateResponseDialog({
   analytics,
   responseData,
   interviewId,
+  feedbackData,
 }: CandidateResponseDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
@@ -47,6 +49,7 @@ export default function CandidateResponseDialog({
             interviewId={interviewId}
             tabSwitchCount={responseData?.tabSwitchCount ?? 0}
             onClose={onClose}
+            feedbackData={feedbackData}
           />
         )}
       </DialogContent>
