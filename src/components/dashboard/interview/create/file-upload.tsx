@@ -58,40 +58,38 @@ export default function FileUpload(props: FileUploadProps) {
     },
   });
 
-  return (
-    <div className="w-full">
-      {!isUploaded ? (
-        <div
-          {...getRootProps({
-            className:
-              "border-dashed border-2 border-primary/40 rounded-xl cursor-pointer bg-primary/10 h-32 flex justify-center items-center flex-col gap-1",
-          })}
-        >
-          <input {...getInputProps()} />
-          <Upload className="h-8 w-8 text-primary" />
-          <p className="mt-1 text-foreground text-sm">
-            Drag &amp; drop files or{" "}
-            <span className="cursor-pointer font-medium text-primary underline">Browse</span>
-          </p>
-          <p className="text-muted-foreground text-xs">Supported formats: PDF (Max 10.0 MB)</p>
-        </div>
-      ) : (
-        <div className="text-left">
-          <p className="mt-2 text-muted-foreground text-sm">
-            File uploaded successfully. {fileName}
-          </p>
-          <p className="mt-2 text-muted-foreground text-xs">
-            Do you want to{" "}
-            <button
-              type="button"
-              className="cursor-pointer font-semibold text-foreground underline"
-              onClick={() => setIsUploaded(false)}
-            >
-              Reupload?
-            </button>
-          </p>
-        </div>
-      )}
+  const uploadZone = (
+    <div
+      {...getRootProps({
+        className:
+          "border-dashed border-2 border-primary/40 rounded-xl cursor-pointer bg-primary/10 h-32 flex justify-center items-center flex-col gap-1",
+      })}
+    >
+      <input {...getInputProps()} />
+      <Upload className="h-8 w-8 text-primary" />
+      <p className="mt-1 text-foreground text-sm">
+        Drag &amp; drop files or{" "}
+        <span className="cursor-pointer font-medium text-primary underline">Browse</span>
+      </p>
+      <p className="text-muted-foreground text-xs">Supported formats: PDF (Max 10.0 MB)</p>
     </div>
   );
+
+  const uploadedView = (
+    <div className="text-left">
+      <p className="mt-2 text-muted-foreground text-sm">File uploaded successfully. {fileName}</p>
+      <p className="mt-2 text-muted-foreground text-xs">
+        Do you want to{" "}
+        <button
+          type="button"
+          className="cursor-pointer font-semibold text-foreground underline"
+          onClick={() => setIsUploaded(false)}
+        >
+          Reupload?
+        </button>
+      </p>
+    </div>
+  );
+
+  return <div className="w-full">{!isUploaded ? uploadZone : uploadedView}</div>;
 }

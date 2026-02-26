@@ -48,6 +48,16 @@ export default function InterviewCard(props: InterviewCardProps) {
     }
   };
 
+  const avatar = interviewerImage ? (
+    <Image
+      src={interviewerImage}
+      alt="Picture of the interviewer"
+      width={40}
+      height={40}
+      className="rounded-full object-cover object-center"
+    />
+  ) : null;
+
   return (
     <Link href={`/interviews/${id}`}>
       <Card className="relative h-64 w-full shrink-0 cursor-pointer gap-4 overflow-hidden rounded-md bg-background p-3 shadow-none">
@@ -84,15 +94,7 @@ export default function InterviewCard(props: InterviewCardProps) {
         <CardFooter className="px-0">
           {/* Bottom row: response count + interviewer avatar */}
           <div className="flex w-full items-center justify-between">
-            {interviewerImage && (
-              <Image
-                src={interviewerImage}
-                alt="Picture of the interviewer"
-                width={40}
-                height={40}
-                className="rounded-full object-cover object-center"
-              />
-            )}
+            {avatar}
             <span className="font-bold text-primary/90 text-sm">{responseCount} Responses</span>
           </div>
         </CardFooter>

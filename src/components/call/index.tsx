@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { toast } from "sonner";
 import { registerCall } from "@/actions/call";
 import { submitFeedback } from "@/actions/feedback";
@@ -22,25 +22,86 @@ interface InterviewProps {
   token: string;
 }
 
+type CallState = {
+  isLoading: boolean;
+  isStarted: boolean;
+  isEnded: boolean;
+  isCalling: boolean;
+  isIneligible: boolean;
+  callId: string;
+  email: string;
+};
+
+type CallAction =
+  | { type: "START_LOADING" }
+  | { type: "STOP_LOADING" }
+  | { type: "START_CALL"; callId: string; email: string }
+  | { type: "END_CALL" }
+  | { type: "SET_INELIGIBLE" }
+  | { type: "CALL_ENDED" };
+
+const initialCallState: CallState = {
+  isLoading: false,
+  isStarted: false,
+  isEnded: false,
+  isCalling: false,
+  isIneligible: false,
+  callId: "",
+  email: "",
+};
+
+function callReducer(state: CallState, action: CallAction): CallState {
+  switch (action.type) {
+    case "START_LOADING":
+      return { ...state, isLoading: true };
+    case "STOP_LOADING":
+      return { ...state, isLoading: false };
+    case "START_CALL":
+      return {
+        ...state,
+        isLoading: false,
+        isStarted: true,
+        isCalling: true,
+        callId: action.callId,
+        email: action.email,
+      };
+    case "END_CALL":
+      return { ...state, isEnded: true, isLoading: false };
+    case "SET_INELIGIBLE":
+      return { ...state, isIneligible: true, isLoading: false };
+    case "CALL_ENDED":
+      return { ...state, isCalling: false, isEnded: true };
+    default:
+      return state;
+  }
+}
+
 export default function Call({ interview, token }: InterviewProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isStarted, setIsStarted] = useState(false);
-  const [isEnded, setIsEnded] = useState(false);
-  const [isCalling, setIsCalling] = useState(false);
-  const [isIneligible, setIsIneligible] = useState(false);
-  const [callId, setCallId] = useState("");
-  const [email, setEmail] = useState("");
+  const [callState, dispatchCall] = useReducer(callReducer, initialCallState);
+  const { isLoading, isStarted, isEnded, isCalling, isIneligible, callId, email } = callState;
+
   const [interviewerImg, setInterviewerImg] = useState("");
-  const [interviewTimeDuration, setInterviewTimeDuration] = useState("1");
   const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [userName, setUserName] = useState("");
 
+  // Refs to avoid stale closures in callbacks stored by hooks
+  const callIdRef = useRef(callId);
   const { tabSwitchCount } = useTabSwitchPrevention();
+  const tabSwitchCountRef = useRef(tabSwitchCount);
+
+  useEffect(() => {
+    callIdRef.current = callId;
+  }, [callId]);
+  useEffect(() => {
+    tabSwitchCountRef.current = tabSwitchCount;
+  }, [tabSwitchCount]);
+
+  const interviewTimeDuration = interview?.timeDuration ?? "1";
 
   const handleCallEnded = () => {
-    setIsCalling(false);
-    setIsEnded(true);
+    dispatchCall({ type: "CALL_ENDED" });
+    updateResponse({ isEnded: true, tabSwitchCount: tabSwitchCountRef.current }, callIdRef.current);
   };
 
   const { lastInterviewerResponse, lastUserResponse, activeTurn, startCall, stopCall } =
@@ -48,7 +109,7 @@ export default function Call({ interview, token }: InterviewProps) {
 
   const handleTimeUp = () => {
     stopCall();
-    setIsEnded(true);
+    dispatchCall({ type: "END_CALL" });
   };
 
   const { elapsedSeconds, progressPercent } = useCallTimer(
@@ -59,12 +120,6 @@ export default function Call({ interview, token }: InterviewProps) {
   const remainingSeconds = Math.max(0, Number(interviewTimeDuration) * 60 - elapsedSeconds);
 
   useEffect(() => {
-    if (interview?.timeDuration) {
-      setInterviewTimeDuration(interview.timeDuration);
-    }
-  }, [interview]);
-
-  useEffect(() => {
     const fetchInterviewer = async () => {
       const data = await getInterviewerAction(Number(interview.interviewerId));
       if (data?.image) setInterviewerImg(data.image);
@@ -73,24 +128,12 @@ export default function Call({ interview, token }: InterviewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [interview.interviewerId]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: only run when isEnded changes
-  useEffect(() => {
-    if (isEnded) {
-      const updateInterview = async () => {
-        await updateResponse({ isEnded: true, tabSwitchCount }, callId);
-      };
-      updateInterview();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEnded]);
-
   const startConversation = async (candidateEmail: string, name: string) => {
-    setIsLoading(true);
+    dispatchCall({ type: "START_LOADING" });
 
     const consumed = await consumeSessionToken(token);
     if (!consumed) {
-      setIsIneligible(true);
-      setIsLoading(false);
+      dispatchCall({ type: "SET_INELIGIBLE" });
       return;
     }
 
@@ -108,13 +151,13 @@ export default function Call({ interview, token }: InterviewProps) {
       (interview?.respondents && !interview?.respondents.includes(candidateEmail));
 
     if (ineligible) {
-      setIsIneligible(true);
+      dispatchCall({ type: "SET_INELIGIBLE" });
     } else {
       const result = await registerCall(Number(interview?.interviewerId), data);
 
       if (!result.success) {
         console.error("Failed to register call:", result.error);
-        setIsLoading(false);
+        dispatchCall({ type: "STOP_LOADING" });
         return;
       }
 
@@ -123,10 +166,7 @@ export default function Call({ interview, token }: InterviewProps) {
       if (access_token) {
         await startCall(access_token);
         setUserName(name);
-        setIsCalling(true);
-        setIsStarted(true);
-        setCallId(call_id);
-        setEmail(candidateEmail);
+        dispatchCall({ type: "START_CALL", callId: call_id, email: candidateEmail });
 
         await createResponse({
           interviewId: interview.id,
@@ -139,17 +179,17 @@ export default function Call({ interview, token }: InterviewProps) {
       }
     }
 
-    setIsLoading(false);
+    dispatchCall({ type: "STOP_LOADING" });
   };
 
   const onEndCallClick = async () => {
     if (isStarted) {
-      setIsLoading(true);
+      dispatchCall({ type: "START_LOADING" });
       stopCall();
-      setIsEnded(true);
-      setIsLoading(false);
+      await updateResponse({ isEnded: true, tabSwitchCount }, callId);
+      dispatchCall({ type: "END_CALL" });
     } else {
-      setIsEnded(true);
+      dispatchCall({ type: "END_CALL" });
     }
   };
 

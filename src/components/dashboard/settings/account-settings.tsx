@@ -73,6 +73,9 @@ export default function AccountSettings({ session }: AccountSettingsProps) {
       toast.success("Profile updated.");
       reset({ name: getValues("name"), email: getValues("email") });
       setEditing(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -85,6 +88,28 @@ export default function AccountSettings({ session }: AccountSettingsProps) {
     });
     setEditing(false);
   };
+
+  const editActions = (
+    <Button
+      type="button"
+      variant="outline"
+      className="border-primary bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary"
+      onClick={() => setEditing(true)}
+    >
+      Edit
+    </Button>
+  );
+
+  const saveActions = (
+    <>
+      <Button type="button" onClick={handleSave} disabled={saving}>
+        {saving ? "Saving..." : "Save"}
+      </Button>
+      <Button type="button" variant="outline" onClick={handleCancel} disabled={saving}>
+        Cancel
+      </Button>
+    </>
+  );
 
   return (
     <>
@@ -131,25 +156,7 @@ export default function AccountSettings({ session }: AccountSettingsProps) {
             />
 
             <div className="flex items-center gap-3">
-              {!editing ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="border-primary bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary"
-                  onClick={() => setEditing(true)}
-                >
-                  Edit
-                </Button>
-              ) : (
-                <>
-                  <Button type="button" onClick={handleSave} disabled={saving}>
-                    {saving ? "Saving..." : "Save"}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={handleCancel} disabled={saving}>
-                    Cancel
-                  </Button>
-                </>
-              )}
+              {!editing ? editActions : saveActions}
 
               {/* Password */}
               <Button type="button" variant="outline" onClick={() => setChangePasswordOpen(true)}>

@@ -13,6 +13,9 @@ export default async function DashboardPage() {
     session = await auth.api.getSession({ headers: await headers() });
   } catch (error) {
     console.error("[DashboardPage] Failed to retrieve session:", error);
+  }
+
+  if (!session) {
     redirect("/sign-in");
   }
 

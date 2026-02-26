@@ -2,7 +2,7 @@
 
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { updateResponse } from "@/actions/responses";
 import {
   DropdownMenu,
@@ -38,10 +38,6 @@ export function CandidateStatusDropdown({ call_id, initialStatus }: CandidateSta
   const [candidateStatus, setCandidateStatus] = useState(initialStatus ?? "");
   const [isStatusUpdating, startStatusTransition] = useTransition();
   const router = useRouter();
-
-  useEffect(() => {
-    setCandidateStatus(initialStatus ?? "");
-  }, [initialStatus]);
 
   const currentStatusConfig = STATUS_CONFIG[candidateStatus] ?? DEFAULT_STATUS;
 

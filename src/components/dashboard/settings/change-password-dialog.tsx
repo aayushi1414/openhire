@@ -72,6 +72,9 @@ export default function ChangePasswordDialog({ open, onOpenChange }: ChangePassw
       toast.success("Password changed successfully.");
       reset();
       onOpenChange(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -96,58 +99,73 @@ export default function ChangePasswordDialog({ open, onOpenChange }: ChangePassw
             <Controller
               name="currentPassword"
               control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Current Password</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="password"
-                    placeholder="••••••••"
-                    disabled={isSubmitting}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
+              render={({ field, fieldState }) => {
+                const fieldError = fieldState.invalid ? (
+                  <FieldError errors={[fieldState.error]} />
+                ) : null;
+                return (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Current Password</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="password"
+                      placeholder="••••••••"
+                      disabled={isSubmitting}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldError}
+                  </Field>
+                );
+              }}
             />
 
             <Controller
               name="newPassword"
               control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="password"
-                    placeholder="••••••••"
-                    disabled={isSubmitting}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
+              render={({ field, fieldState }) => {
+                const fieldError = fieldState.invalid ? (
+                  <FieldError errors={[fieldState.error]} />
+                ) : null;
+                return (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="password"
+                      placeholder="••••••••"
+                      disabled={isSubmitting}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldError}
+                  </Field>
+                );
+              }}
             />
 
             <Controller
               name="confirmPassword"
               control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Confirm New Password</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    type="password"
-                    placeholder="••••••••"
-                    disabled={isSubmitting}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
+              render={({ field, fieldState }) => {
+                const fieldError = fieldState.invalid ? (
+                  <FieldError errors={[fieldState.error]} />
+                ) : null;
+                return (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Confirm New Password</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      type="password"
+                      placeholder="••••••••"
+                      disabled={isSubmitting}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldError}
+                  </Field>
+                );
+              }}
             />
           </FieldGroup>
 
