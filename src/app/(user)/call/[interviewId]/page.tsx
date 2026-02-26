@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Call from "@/components/call";
 import { validateSessionToken } from "@/actions/session-tokens";
+import Call from "@/components/call";
 import { getInterviewById } from "@/lib/data/interviews";
 import type { Interview } from "@/types/interview";
 
