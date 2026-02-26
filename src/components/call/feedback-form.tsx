@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -39,7 +39,7 @@ interface FeedbackFormProps {
 }
 
 export default function FeedbackForm({ onSubmit, email }: FeedbackFormProps) {
-  const { control, handleSubmit, setValue, watch, formState } = useForm<FormValues>({
+  const { control, handleSubmit, setValue, formState } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       satisfaction: SatisfactionLevel.Positive,
@@ -47,7 +47,7 @@ export default function FeedbackForm({ onSubmit, email }: FeedbackFormProps) {
     },
   });
 
-  const satisfaction = watch("satisfaction");
+  const satisfaction = useWatch({ control, name: "satisfaction" });
 
   const handleFormSubmit = (values: FormValues) => {
     onSubmit({

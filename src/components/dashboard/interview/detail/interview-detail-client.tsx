@@ -1,10 +1,10 @@
 "use client";
 
-import type { ColumnDef, PaginationState, Updater } from "@tanstack/react-table";
+import type { PaginationState, Updater } from "@tanstack/react-table";
 import { Clock, Pencil, Trash2, UserCheck, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useReducer, useState } from "react";
 import { toast } from "sonner";
 import { analyzeCall, getCallData } from "@/actions/call";
 import { getFeedbackByInterviewIdAndEmail } from "@/actions/feedback";
@@ -15,15 +15,14 @@ import MainInterviewDialog from "@/components/dashboard/interview/create/main-in
 import DeleteInterviewDialog from "@/components/dashboard/interview/detail/delete-interview-dialog";
 import InterviewDetailSearch from "@/components/dashboard/interview/detail/interview-detail-search";
 import StatusCard from "@/components/dashboard/interview/detail/status-card";
+import { useInterviewDetailColumns } from "@/components/dashboard/interview/detail/use-interview-detail-columns";
 import type { BreadcrumbOptions } from "@/components/ui/app-breadcrumbs";
 import AppBreadcrumbs from "@/components/ui/app-breadcrumbs";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Switch } from "@/components/ui/switch";
 import { PAGE_SIZE } from "@/lib/constants";
-import { CandidateStatus } from "@/lib/enum";
-import { convertSecondstoMMSS, formatTimestampToDateHHMM } from "@/lib/utils";
+import { convertSecondstoMMSS } from "@/lib/utils";
 import type { Interview } from "@/types/interview";
 import type { Interviewer } from "@/types/interviewer";
 import type {
@@ -49,17 +48,72 @@ interface InterviewDetailsClientsProps {
   statsTotal: number;
 }
 
-const STATUS_BADGE: Record<string, string> = {
-  [CandidateStatus.SELECTED]: "bg-green-100 text-green-700 border-green-200",
-  [CandidateStatus.POTENTIAL]: "bg-yellow-100 text-yellow-700 border-yellow-200",
-  [CandidateStatus.NOT_SELECTED]: "bg-red-100 text-red-700 border-red-200",
-  [CandidateStatus.NO_STATUS]: "bg-gray-100 text-gray-500 border-gray-200",
+type ResponseDialogState = {
+  isOpen: boolean;
+  isLoading: boolean;
+  callId: string | null;
+  callData: CallData | null;
+  analytics: Analytics | null;
+  response: InterviewDetailTableResponse | null;
+  feedback: FeedbackData | null;
 };
+
+type ResponseDialogAction =
+  | { type: "OPEN"; callId: string }
+  | { type: "CLOSE" }
+  | {
+      type: "SET_DATA";
+      callData: CallData | null;
+      analytics: Analytics | null;
+      response: InterviewDetailTableResponse | null;
+      feedback: FeedbackData | null;
+    };
+
+const initialResponseDialogState: ResponseDialogState = {
+  isOpen: false,
+  isLoading: false,
+  callId: null,
+  callData: null,
+  analytics: null,
+  response: null,
+  feedback: null,
+};
+
+function responseDialogReducer(
+  state: ResponseDialogState,
+  action: ResponseDialogAction,
+): ResponseDialogState {
+  switch (action.type) {
+    case "OPEN":
+      return {
+        isOpen: true,
+        isLoading: true,
+        callId: action.callId,
+        callData: null,
+        analytics: null,
+        response: null,
+        feedback: null,
+      };
+    case "CLOSE":
+      return { ...state, isOpen: false };
+    case "SET_DATA":
+      return {
+        ...state,
+        isLoading: false,
+        callData: action.callData,
+        analytics: action.analytics,
+        response: action.response,
+        feedback: action.feedback,
+      };
+    default:
+      return state;
+  }
+}
 
 export default function InterviewDetailClient(props: InterviewDetailsClientsProps) {
   const { interview, data, stats, interviewers, totalCount, statsTotal } = props;
   const router = useRouter();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [modals, setModals] = useState({ editOpen: false, deleteOpen: false });
   const [isActive, setIsActive] = useState<boolean>(interview.isActive ?? true);
 
   const [page, setPage] = useQueryState(
@@ -78,19 +132,12 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
   );
 
   const [searchValue, setSearchValue] = useState<string>(search ?? "");
-
   const [analyzingCallId, setAnalyzingCallId] = useState<string | null>(null);
 
-  const [isResponseOpen, setIsResponseOpen] = useState(false);
-  const [isResponseLoading, setIsResponseLoading] = useState(false);
-  const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
-  const [selectedCallData, setSelectedCallData] = useState<CallData | null>(null);
-  const [selectedAnalytics, setSelectedAnalytics] = useState<Analytics | null>(null);
-  const [selectedResponse, setSelectedResponse] = useState<InterviewDetailTableResponse | null>(
-    null,
+  const [responseDialog, dispatchResponseDialog] = useReducer(
+    responseDialogReducer,
+    initialResponseDialogState,
   );
-  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackData | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const pagination: PaginationState = { pageIndex: page ?? 0, pageSize: PAGE_SIZE };
 
@@ -147,13 +194,7 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
 
   const handleViewResponse = useCallback(
     async (response: InterviewDetailTableResponse) => {
-      setSelectedCallId(response.callId);
-      setIsResponseOpen(true);
-      setIsResponseLoading(true);
-      setSelectedCallData(null);
-      setSelectedAnalytics(null);
-      setSelectedResponse(null);
-      setSelectedFeedback(null);
+      dispatchResponseDialog({ type: "OPEN", callId: response.callId });
 
       if (!response.isViewed) {
         updateResponse({ isViewed: true }, response.callId).then(() => router.refresh());
@@ -165,13 +206,13 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
         getFeedbackByInterviewIdAndEmail(interview.id, response.email),
       ]);
 
-      if (callResult.success) {
-        setSelectedCallData(callResult.data?.callResponse ?? null);
-        setSelectedAnalytics(callResult.data?.analytics ?? null);
-      }
-      setSelectedResponse(respData);
-      setSelectedFeedback(feedbackResult ?? null);
-      setIsResponseLoading(false);
+      dispatchResponseDialog({
+        type: "SET_DATA",
+        callData: callResult.success ? (callResult.data?.callResponse ?? null) : null,
+        analytics: callResult.success ? (callResult.data?.analytics ?? null) : null,
+        response: respData,
+        feedback: feedbackResult ?? null,
+      });
     },
     [router, interview.id],
   );
@@ -193,131 +234,11 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
     setPage(null);
   };
 
-  const columns = useMemo<ColumnDef<InterviewDetailTableResponse>[]>(() => {
-    return [
-      {
-        header: "Name",
-        accessorKey: "name",
-        size: 150,
-      },
-      {
-        header: "Email",
-        accessorKey: "email",
-        size: 200,
-      },
-      {
-        header: "Overall Score",
-        accessorKey: "analytics.overallScore",
-        cell: ({ row }) => {
-          const score = row.original.analytics?.overallScore;
-          return score != null ? (
-            <Badge className="size-7 bg-primary/20 text-primary">{score}</Badge>
-          ) : (
-            "—"
-          );
-        },
-        meta: {
-          headerAlign: "center",
-          bodyAlign: "center",
-        },
-      },
-      {
-        header: "Communication",
-        accessorKey: "analytics.communication.score",
-        cell: ({ row }) => {
-          const score = row.original.analytics?.communication?.score;
-          return score != null ? (
-            <Badge className="size-7 bg-muted-foreground/30 text-foreground">{score}</Badge>
-          ) : (
-            "—"
-          );
-        },
-        meta: {
-          headerAlign: "center",
-          bodyAlign: "center",
-        },
-      },
-
-      {
-        header: "Date",
-        accessorKey: "createdAt",
-        cell: ({ row }) => formatTimestampToDateHHMM(String(row.original.createdAt)),
-        meta: {
-          headerAlign: "center",
-          bodyAlign: "center",
-        },
-      },
-      {
-        header: "Duration",
-        accessorKey: "duration",
-        cell: ({ row }) => convertSecondstoMMSS(row.original.duration ?? 0),
-        meta: {
-          headerAlign: "center",
-          bodyAlign: "center",
-        },
-      },
-      {
-        header: "Status",
-        accessorKey: "candidateStatus",
-        size: 100,
-        cell: ({ row }) => {
-          const status = row.original.candidateStatus ?? CandidateStatus.NO_STATUS;
-          const label =
-            status === CandidateStatus.NO_STATUS
-              ? "No Status"
-              : status === CandidateStatus.NOT_SELECTED
-                ? "Not Selected"
-                : status === CandidateStatus.POTENTIAL
-                  ? "Potential"
-                  : status === CandidateStatus.SELECTED
-                    ? "Selected"
-                    : status;
-          return (
-            <Badge
-              variant="outline"
-              className={STATUS_BADGE[status] ?? "border-gray-200 bg-gray-100 text-gray-500"}
-            >
-              {label}
-            </Badge>
-          );
-        },
-        meta: {
-          headerAlign: "center",
-          bodyAlign: "center",
-        },
-      },
-      {
-        id: "actions",
-        header: "Details",
-        cell: ({ row }) => (
-          <div className="flex justify-center gap-2">
-            <Button
-              size="xs"
-              variant="outline"
-              className="border-primary bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary"
-              onClick={() => handleViewResponse(row.original)}
-            >
-              View
-            </Button>
-            {!row.original.isAnalysed && (
-              <Button
-                size="xs"
-                variant="outline"
-                className="border-orange-300 bg-orange-50 text-orange-600 hover:bg-orange-50 hover:text-orange-600"
-                onClick={() => handleAnalyzeResponse(row.original)}
-                disabled={analyzingCallId === row.original.callId}
-              >
-                {analyzingCallId === row.original.callId ? "Analyzing..." : "Analyze"}
-              </Button>
-            )}
-          </div>
-        ),
-        meta: {
-          headerAlign: "center",
-        },
-      },
-    ];
-  }, [analyzingCallId, handleViewResponse, handleAnalyzeResponse]);
+  const columns = useInterviewDetailColumns({
+    analyzingCallId,
+    handleViewResponse,
+    handleAnalyzeResponse,
+  });
 
   return (
     <div className="space-y-5">
@@ -335,7 +256,7 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
           <Button
             variant="outline"
             size="xs"
-            onClick={() => setIsEditModalOpen(true)}
+            onClick={() => setModals((m) => ({ ...m, editOpen: true }))}
             title="Edit interview"
             className="border-primary bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary"
           >
@@ -345,7 +266,7 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
           <Button
             variant="outline"
             size="xs"
-            onClick={() => setIsDeleteModalOpen(true)}
+            onClick={() => setModals((m) => ({ ...m, deleteOpen: true }))}
             title="Delete interview"
             className="border-destructive bg-destructive/10 text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
@@ -402,24 +323,24 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
         />
       </div>
 
-      {isResponseOpen && (
+      {responseDialog.isOpen && (
         <CandidateResponseDialog
-          open={isResponseOpen}
-          onClose={() => setIsResponseOpen(false)}
-          isLoading={isResponseLoading}
-          callId={selectedCallId ?? ""}
-          callData={selectedCallData}
-          analytics={selectedAnalytics}
-          responseData={selectedResponse}
+          open={responseDialog.isOpen}
+          onClose={() => dispatchResponseDialog({ type: "CLOSE" })}
+          isLoading={responseDialog.isLoading}
+          callId={responseDialog.callId ?? ""}
+          callData={responseDialog.callData}
+          analytics={responseDialog.analytics}
+          responseData={responseDialog.response}
           interviewId={interview.id}
-          feedbackData={selectedFeedback}
+          feedbackData={responseDialog.feedback}
         />
       )}
 
-      {isDeleteModalOpen && (
+      {modals.deleteOpen && (
         <DeleteInterviewDialog
-          open={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
+          open={modals.deleteOpen}
+          onClose={() => setModals((m) => ({ ...m, deleteOpen: false }))}
           interviewId={interview.id}
           interviewName={interview.name}
           onDeleted={() => router.push("/")}
@@ -427,10 +348,10 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
       )}
 
       {/* Edit interview modal */}
-      {isEditModalOpen && (
+      {modals.editOpen && (
         <MainInterviewDialog
-          open={isEditModalOpen}
-          setOpen={setIsEditModalOpen}
+          open={modals.editOpen}
+          setOpen={(val) => setModals((m) => ({ ...m, editOpen: val }))}
           interviewers={interviewers}
           mode="edit"
           initialData={{

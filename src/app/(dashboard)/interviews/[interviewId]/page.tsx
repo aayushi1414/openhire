@@ -56,8 +56,10 @@ function computeStats(responses: Pick<Response, "duration" | "candidateStatus" |
 }
 
 export default async function InterviewPage({ params, searchParams }: Props) {
-  const { interviewId } = await params;
-  const { page, search, status } = await searchParamsCache.parse(searchParams);
+  const [{ interviewId }, { page, search, status }] = await Promise.all([
+    params,
+    searchParamsCache.parse(searchParams),
+  ]);
 
   const [interview, { data: responses, total }, statsData, interviewers] = await Promise.all([
     getInterviewById(interviewId),

@@ -10,7 +10,6 @@ export default async function SettingsPage() {
     session = await auth.api.getSession({ headers: await headers() });
   } catch (error) {
     console.error("[SettingsPage] Failed to retrieve session:", error);
-    redirect("/sign-in");
   }
 
   if (!session) {

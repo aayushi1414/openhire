@@ -1,4 +1,5 @@
 "use client";
+"use no memo";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,6 +1,8 @@
 import { CheckCircleIcon } from "lucide-react";
 import type React from "react";
 
+const DEFAULT_ICON = <CheckCircleIcon className="mx-auto my-4 h-8 w-8 text-primary" />;
+
 interface ScreenStatusCardProps {
   icon?: React.ReactNode;
   title: string;
@@ -9,12 +11,7 @@ interface ScreenStatusCardProps {
 }
 
 export function ScreenStatusCard(props: ScreenStatusCardProps) {
-  const {
-    icon = <CheckCircleIcon className="mx-auto my-4 h-8 w-8 text-primary" />,
-    title,
-    description,
-    children,
-  } = props;
+  const { icon = DEFAULT_ICON, title, description, children } = props;
   return (
     <div className="mx-auto w-full max-w-md">
       <div className="rounded-md border border-primary/20 bg-muted">

@@ -56,10 +56,14 @@ export default function CandidateResponseDialog(props: CandidateResponseDialogPr
         return updated;
       };
 
-      const processed = replaceAgentAndUser(callData.transcript as string, responseData.name);
-      const rawHtml = await marked.parse(processed);
-      const DOMPurify = (await import("dompurify")).default;
-      setTranscriptHtml(DOMPurify.sanitize(rawHtml));
+      try {
+        const processed = replaceAgentAndUser(callData.transcript as string, responseData.name);
+        const rawHtml = await marked.parse(processed);
+        const DOMPurify = (await import("dompurify")).default;
+        setTranscriptHtml(DOMPurify.sanitize(rawHtml));
+      } catch (error) {
+        console.error("Failed to process transcript:", error);
+      }
     }
 
     processTranscript();
@@ -85,36 +89,38 @@ export default function CandidateResponseDialog(props: CandidateResponseDialogPr
     });
   };
 
+  const dialogBody = isLoading ? (
+    <div className="flex h-64 items-center justify-center">
+      <LoaderWithText />
+    </div>
+  ) : (
+    <div className="flex flex-col gap-3">
+      <CandidateHeader
+        call_id={callId}
+        name={responseData?.name ?? ""}
+        email={responseData?.email ?? ""}
+        candidateStatus={responseData?.candidateStatus ?? ""}
+        recordingUrl={callData?.recording_url}
+        tabSwitchCount={responseData?.tabSwitchCount ?? 0}
+        isDeleting={isDeleting}
+        onDeleteClick={onDeleteResponseClick}
+      />
+      <GeneralSummary analytics={analytics} callData={callData} />
+      {analytics?.questionSummaries && (
+        <QuestionSummary questionSummaries={analytics.questionSummaries} />
+      )}
+      <TranscriptView transcriptHtml={transcriptHtml} />
+      {feedbackData && <CandidateFeedback feedbackData={feedbackData} />}
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="w-full sm:max-w-6xl">
         <DialogHeader>
           <DialogTitle>Candidate Response</DialogTitle>
         </DialogHeader>
-        {isLoading ? (
-          <div className="flex h-64 items-center justify-center">
-            <LoaderWithText />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <CandidateHeader
-              call_id={callId}
-              name={responseData?.name ?? ""}
-              email={responseData?.email ?? ""}
-              candidateStatus={responseData?.candidateStatus ?? ""}
-              recordingUrl={callData?.recording_url}
-              tabSwitchCount={responseData?.tabSwitchCount ?? 0}
-              isDeleting={isDeleting}
-              onDeleteClick={onDeleteResponseClick}
-            />
-            <GeneralSummary analytics={analytics} callData={callData} />
-            {analytics?.questionSummaries && (
-              <QuestionSummary questionSummaries={analytics.questionSummaries} />
-            )}
-            <TranscriptView transcriptHtml={transcriptHtml} />
-            {feedbackData && <CandidateFeedback feedbackData={feedbackData} />}
-          </div>
-        )}
+        {dialogBody}
       </DialogContent>
     </Dialog>
   );
