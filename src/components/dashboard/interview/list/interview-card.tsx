@@ -1,10 +1,11 @@
 "use client";
 
-import { ArrowUpRight, Copy, CopyCheck } from "lucide-react";
+import { Copy, CopyCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { generateSessionToken } from "@/actions/session-tokens";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
@@ -21,19 +22,17 @@ interface InterviewCardProps {
 export default function InterviewCard(props: InterviewCardProps) {
   const { name, id, readableSlug, interviewerImage, responseCount, isActive } = props;
   const [copied, setCopied] = useState(false);
-
-  const buildInterviewUrl = () => {
-    const host = window.location.host;
-    const protocol = host.includes("localhost") ? "http" : "https";
-    if (readableSlug) {
-      return `${protocol}://${host}/call/${readableSlug}`;
-    }
-    return `${protocol}://${host}/call/${id}`;
-  };
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const copyToClipboard = async () => {
+    setIsGenerating(true);
     try {
-      await navigator.clipboard.writeText(buildInterviewUrl());
+      const { token } = await generateSessionToken(id);
+      const host = window.location.host;
+      const protocol = host.includes("localhost") ? "http" : "https";
+      const slug = readableSlug ?? id;
+      const url = `${protocol}://${host}/call/${slug}?token=${token}`;
+      await navigator.clipboard.writeText(url);
       setCopied(true);
       toast.success("The link to your interview has been copied to your clipboard.", {
         position: "bottom-right",
@@ -44,13 +43,9 @@ export default function InterviewCard(props: InterviewCardProps) {
       }, 2000);
     } catch (_err) {
       toast.error("Could not copy link. Please copy it manually.", { position: "bottom-right" });
+    } finally {
+      setIsGenerating(false);
     }
-  };
-
-  const handleJumpToInterview = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
-    window.open(buildInterviewUrl(), "_blank");
   };
 
   return (
@@ -67,13 +62,7 @@ export default function InterviewCard(props: InterviewCardProps) {
             <div className="flex gap-1">
               <Button
                 size="icon-xs"
-                onClick={handleJumpToInterview}
-                aria-label="Open interview in new tab"
-              >
-                <ArrowUpRight />
-              </Button>
-              <Button
-                size="icon-xs"
+                disabled={isGenerating}
                 aria-label={copied ? "Link copied" : "Copy interview link"}
                 onClick={(event) => {
                   event.stopPropagation();

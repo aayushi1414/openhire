@@ -65,3 +65,12 @@ export const feedback = pgTable("feedback", {
   feedbackText: text("feedback"),
   satisfaction: integer("satisfaction"),
 });
+
+export const sessionToken = pgTable("session_token", {
+  id: serial("id").primaryKey(),
+  token: text("token").notNull().unique(),
+  interviewId: text("interview_id").references(() => interview.id),
+  status: text("status").notNull().default("unused"), // 'unused' | 'used'
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+});

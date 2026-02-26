@@ -6,6 +6,7 @@ import { registerCall } from "@/actions/call";
 import { submitFeedback } from "@/actions/feedback";
 import { getInterviewerAction } from "@/actions/interviewers";
 import { createResponse, getAllEmailsAction, updateResponse } from "@/actions/responses";
+import { consumeSessionToken } from "@/actions/session-tokens";
 import { useCallTimer } from "@/hooks/use-call-timer";
 import { useRetellClient } from "@/hooks/use-retell-client";
 import type { Interview } from "@/types/interview";
@@ -18,9 +19,10 @@ import { TabSwitchWarning, useTabSwitchPrevention } from "./tab-switch-preventio
 
 interface InterviewProps {
   interview: Interview;
+  token: string;
 }
 
-export default function Call({ interview }: InterviewProps) {
+export default function Call({ interview, token }: InterviewProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isStarted, setIsStarted] = useState(false);
   const [isEnded, setIsEnded] = useState(false);
@@ -84,6 +86,13 @@ export default function Call({ interview }: InterviewProps) {
 
   const startConversation = async (candidateEmail: string, name: string) => {
     setIsLoading(true);
+
+    const consumed = await consumeSessionToken(token);
+    if (!consumed) {
+      setIsIneligible(true);
+      setIsLoading(false);
+      return;
+    }
 
     const data = {
       mins: interview?.timeDuration,
