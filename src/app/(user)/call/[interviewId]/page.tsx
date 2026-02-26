@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { validateSessionToken } from "@/actions/session-tokens";
 import Call from "@/components/call";
 import { getInterviewById } from "@/lib/data/interviews";
 import type { Interview } from "@/types/interview";
@@ -8,6 +9,7 @@ interface Props {
   params: Promise<{
     interviewId: string;
   }>;
+  searchParams: Promise<{ token?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -49,7 +51,7 @@ function PopUpMessage({ title, description, image }: PopUpMessageProps) {
   );
 }
 
-export default async function InterviewInterface({ params }: Props) {
+export default async function InterviewInterface({ params, searchParams }: Props) {
   const { interviewId } = await params;
   const interview = await getInterviewById(interviewId);
 
@@ -73,5 +75,39 @@ export default async function InterviewInterface({ params }: Props) {
     );
   }
 
-  return <Call interview={interview as unknown as Interview} />;
+  const { token } = await searchParams;
+
+  if (!token) {
+    return (
+      <PopUpMessage
+        title="Invalid Link"
+        description="This interview link is missing a required token. Please request a new link from the sender."
+        image="/invalid-url.png"
+      />
+    );
+  }
+
+  const tokenStatus = await validateSessionToken(token, interview.id);
+
+  if (tokenStatus === "invalid") {
+    return (
+      <PopUpMessage
+        title="Invalid Link"
+        description="This interview link is invalid or has expired. Please request a new link from the sender."
+        image="/invalid-url.png"
+      />
+    );
+  }
+
+  if (tokenStatus === "used") {
+    return (
+      <PopUpMessage
+        title="Link Expired"
+        description="This interview link has already been used. Please request a new link from the sender."
+        image="/closed.png"
+      />
+    );
+  }
+
+  return <Call interview={interview as unknown as Interview} token={token} />;
 }
