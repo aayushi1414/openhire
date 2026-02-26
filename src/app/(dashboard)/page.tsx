@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import CreateInterviewCard from "@/components/dashboard/interview/list/create-interview-card";
 import InterviewCard from "@/components/dashboard/interview/list/interview-card";
 import { auth } from "@/lib/auth";
@@ -6,7 +7,14 @@ import { getAllInterviewers } from "@/lib/data/interviewers";
 import { getInterviewsWithDetails } from "@/lib/data/interviews";
 
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  let session = null;
+
+  try {
+    session = await auth.api.getSession({ headers: await headers() });
+  } catch (error) {
+    console.error("[DashboardPage] Failed to retrieve session:", error);
+    redirect("/sign-in");
+  }
 
   const [interviews, interviewers] = await Promise.all([
     session?.user.id ? getInterviewsWithDetails(session.user.id) : Promise.resolve([]),

@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, PlayCircleIcon } from "lucide-react";
+import { LogOut, PlayCircleIcon, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -58,6 +58,19 @@ export default function AppSidebar() {
                 <Link href="/">
                   <PlayCircleIcon />
                   <span>Interviews</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname.startsWith("/settings")}
+                tooltip="Settings"
+              >
+                <Link href="/" as="/settings">
+                  <Settings />
+                  <span>Settings</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
