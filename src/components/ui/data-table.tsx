@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import DataTablePagination from "./data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -77,7 +78,7 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
 
   return (
     <div>
-      <div className="overflow-x-auto rounded-md border">
+      <div className="mb-4 overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -152,6 +153,16 @@ export function DataTable<TData, TValue>(props: DataTableProps<TData, TValue>) {
           </TableBody>
         </Table>
       </div>
+
+      {pagination && setPagination && table.getPageCount() > 1 && (
+        <DataTablePagination
+          table={table}
+          pageIndex={table.getState().pagination.pageIndex}
+          pageCount={table.getPageCount()}
+          canPreviousPage={table.getCanPreviousPage()}
+          canNextPage={table.getCanNextPage()}
+        />
+      )}
     </div>
   );
 }

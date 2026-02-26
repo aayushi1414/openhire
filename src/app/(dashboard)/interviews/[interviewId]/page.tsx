@@ -1,19 +1,27 @@
 import { notFound } from "next/navigation";
+import { createSearchParamsCache, parseAsInteger, parseAsString } from "nuqs/server";
 import InterviewDetailClient from "@/components/dashboard/interview/detail/interview-detail-client";
 import { getAllInterviewers } from "@/lib/data/interviewers";
 import { getInterviewById } from "@/lib/data/interviews";
-import { getAllResponses } from "@/lib/data/responses";
+import { getResponsesForStats, getResponsesPaginated, PAGE_SIZE } from "@/lib/data/responses";
 import { CandidateStatus } from "@/lib/enum";
 import type { Interview } from "@/types/interview";
 import type { InterviewDetailTableResponse, Response } from "@/types/response";
+
+const searchParamsCache = createSearchParamsCache({
+  page: parseAsInteger.withDefault(0),
+  search: parseAsString.withDefault(""),
+  status: parseAsString.withDefault("ALL"),
+});
 
 interface Props {
   params: Promise<{
     interviewId: string;
   }>;
+  searchParams: Promise<Record<string, string | string[]>>;
 }
 
-function computeStats(responses: Response[]) {
+function computeStats(responses: Pick<Response, "duration" | "candidateStatus" | "details">[]) {
   let totalDuration = 0;
   let completedCount = 0;
   const sentimentCount = { positive: 0, negative: 0, neutral: 0 };
@@ -47,12 +55,14 @@ function computeStats(responses: Response[]) {
   return { avgDuration, completionRate, sentimentCount, candidateStatusCount };
 }
 
-export default async function InterviewPage({ params }: Props) {
+export default async function InterviewPage({ params, searchParams }: Props) {
   const { interviewId } = await params;
+  const { page, search, status } = await searchParamsCache.parse(searchParams);
 
-  const [interview, responses, interviewers] = await Promise.all([
+  const [interview, { data: responses, total }, statsData, interviewers] = await Promise.all([
     getInterviewById(interviewId),
-    getAllResponses(interviewId),
+    getResponsesPaginated({ interviewId, page, pageSize: PAGE_SIZE, search, status }),
+    getResponsesForStats(interviewId),
     getAllInterviewers(),
   ]);
 
@@ -60,7 +70,9 @@ export default async function InterviewPage({ params }: Props) {
     notFound();
   }
 
-  const stats = computeStats(responses as Response[]);
+  const stats = computeStats(
+    statsData as Pick<Response, "duration" | "candidateStatus" | "details">[],
+  );
 
   return (
     <InterviewDetailClient
@@ -68,6 +80,8 @@ export default async function InterviewPage({ params }: Props) {
       data={responses as unknown as InterviewDetailTableResponse[]}
       stats={stats}
       interviewers={interviewers}
+      totalCount={total}
+      statsTotal={statsData.length}
     />
   );
 }

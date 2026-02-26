@@ -1,3 +1,5 @@
+export const PAGE_SIZE = 10;
+
 export const RETELL_AGENT_GENERAL_PROMPT = `You are an interviewer who is an expert in asking follow up questions to uncover deeper insights. You have to keep the interview for {{mins}} or short. 
 
 The name of the person you are interviewing is {{name}}. 

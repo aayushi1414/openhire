@@ -1,8 +1,9 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, PaginationState, Updater } from "@tanstack/react-table";
 import { Clock, Pencil, Trash2, UserCheck, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { analyzeCall, getCallData } from "@/actions/call";
@@ -20,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Switch } from "@/components/ui/switch";
+import { PAGE_SIZE } from "@/lib/constants";
 import { CandidateStatus } from "@/lib/enum";
 import { convertSecondstoMMSS, formatTimestampToDateHHMM } from "@/lib/utils";
 import type { Interview } from "@/types/interview";
@@ -43,6 +45,8 @@ interface InterviewDetailsClientsProps {
   data: InterviewDetailTableResponse[];
   stats: Stats;
   interviewers: Interviewer[];
+  totalCount: number;
+  statsTotal: number;
 }
 
 const STATUS_BADGE: Record<string, string> = {
@@ -53,13 +57,27 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 export default function InterviewDetailClient(props: InterviewDetailsClientsProps) {
-  const { interview, data, stats, interviewers } = props;
+  const { interview, data, stats, interviewers, totalCount, statsTotal } = props;
   const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isActive, setIsActive] = useState<boolean>(interview.isActive ?? true);
-  const [filterStatus, setFilterStatus] = useState<string>("ALL");
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [activeSearch, setActiveSearch] = useState<string>("");
+
+  const [page, setPage] = useQueryState(
+    "page",
+    parseAsInteger.withDefault(0).withOptions({ shallow: false }),
+  );
+
+  const [status, setStatus] = useQueryState(
+    "status",
+    parseAsString.withDefault("ALL").withOptions({ shallow: false }),
+  );
+
+  const [search, setSearch] = useQueryState(
+    "search",
+    parseAsString.withDefault("").withOptions({ shallow: false }),
+  );
+
+  const [searchValue, setSearchValue] = useState<string>(search ?? "");
 
   const [analyzingCallId, setAnalyzingCallId] = useState<string | null>(null);
 
@@ -73,6 +91,17 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
   );
   const [selectedFeedback, setSelectedFeedback] = useState<FeedbackData | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const pagination: PaginationState = { pageIndex: page ?? 0, pageSize: PAGE_SIZE };
+
+  const setPagination = useCallback(
+    (updater: Updater<PaginationState>) => {
+      const current: PaginationState = { pageIndex: page ?? 0, pageSize: PAGE_SIZE };
+      const next = typeof updater === "function" ? updater(current) : updater;
+      setPage(next.pageIndex);
+    },
+    [page, setPage],
+  );
 
   const breadcrumbs: BreadcrumbOptions[] = [
     {
@@ -147,20 +176,22 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
     [router, interview.id],
   );
 
-  const filteredResponses = data
-    .filter((r) => {
-      if (filterStatus === "ALL") return true;
-      if (filterStatus === CandidateStatus.NO_STATUS) {
-        return !r.candidateStatus || r.candidateStatus === CandidateStatus.NO_STATUS;
-      }
-      return r.candidateStatus === filterStatus;
-    })
-    .filter((r) => {
-      if (!activeSearch) {
-        return true;
-      }
-      return r.name?.toLowerCase().includes(activeSearch.toLowerCase());
-    });
+  const handleFilterChange = (newStatus: string) => {
+    setStatus(newStatus);
+    setPage(0);
+  };
+
+  const handleSearch = () => {
+    setSearch(searchValue);
+    setPage(0);
+  };
+
+  const handleClearSearch = () => {
+    setSearchValue("");
+    setSearch(null);
+    setStatus(null);
+    setPage(null);
+  };
 
   const columns = useMemo<ColumnDef<InterviewDetailTableResponse>[]>(() => {
     return [
@@ -329,7 +360,7 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
       <div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <StatusCard
-            value={data.length}
+            value={statsTotal}
             icon={<Users size={20} className="text-primary" />}
             label="Total Candidates"
           />
@@ -349,29 +380,25 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
       {/* Response table */}
       <div className="flex w-full flex-col gap-2 pb-4">
         <InterviewDetailSearch
-          filterStatus={filterStatus}
-          onFilterStatusChange={setFilterStatus}
+          filterStatus={status ?? "ALL"}
+          onFilterStatusChange={handleFilterChange}
           searchValue={searchValue}
           onSearchValueChange={(val) => {
             setSearchValue(val);
-            if (!val) {
-              setActiveSearch("");
-            }
+            if (!val) handleClearSearch();
           }}
-          onSearch={() => {
-            setActiveSearch(searchValue);
-          }}
-          onClearSearch={() => {
-            setSearchValue("");
-            setActiveSearch("");
-            setFilterStatus("ALL");
-          }}
+          onSearch={handleSearch}
+          onClearSearch={handleClearSearch}
         />
 
         <DataTable
           columns={columns}
-          data={filteredResponses}
+          data={data}
           emptyMessage="No responses to display"
+          pagination={pagination}
+          setPagination={setPagination}
+          rowCount={totalCount}
+          manualPagination={true}
         />
       </div>
 
