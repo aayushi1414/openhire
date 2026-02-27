@@ -12,7 +12,7 @@ export function QuestionSummary({ questionSummaries }: QuestionSummaryProps) {
   return (
     <div className="my-3 min-h-30 rounded-xl bg-muted p-4 px-5">
       <p className="my-2 mb-4 font-semibold">Question Summary</p>
-      <ScrollArea className="scrollbar-thin mt-3 h-72 overflow-y-scroll whitespace-pre-line rounded-md px-2 py-3 text-sm leading-6">
+      <ScrollArea className="scrollbar-thin max-h-96 overflow-y-auto whitespace-pre-line rounded-lg px-2 text-sm">
         {questionSummaries.map((qs, index) => (
           <QuestionAnswerCard
             key={qs.question}
