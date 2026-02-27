@@ -44,13 +44,15 @@ export function CandidateHeader(props: CandidateHeaderProps) {
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-end">
-              {tabSwitchCount && tabSwitchCount > 0 && (
+              {tabSwitchCount && tabSwitchCount > 0 ? (
                 <Badge
                   variant="outline"
                   className="rounded-md border-orange-300 bg-orange-50 py-2.5 text-orange-600"
                 >
                   Tab Switching Detected
                 </Badge>
+              ) : (
+                ""
               )}
             </div>
 
