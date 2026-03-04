@@ -9,15 +9,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CandidateStatus } from "@/lib/enum";
+import { CANDIDATE_STATUS_OPTIONS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const STATUS_OPTIONS = [
-  { value: "ALL", label: "All" },
-  { value: CandidateStatus.NO_STATUS, label: "No Status" },
-  { value: CandidateStatus.NOT_SELECTED, label: "Not Selected" },
-  { value: CandidateStatus.POTENTIAL, label: "Potential" },
-  { value: CandidateStatus.SELECTED, label: "Selected" },
+  { value: "ALL", label: "All", dot: "", badge: "" },
+  ...CANDIDATE_STATUS_OPTIONS,
 ];
 
 interface InterviewDetailSearchProps {
@@ -64,6 +61,7 @@ export default function InterviewDetailSearch(props: InterviewDetailSearchProps)
               <Check
                 className={cn("h-4 w-4", filterStatus === opt.value ? "opacity-100" : "opacity-0")}
               />
+              {opt.dot && <div className={`h-2 w-2 shrink-0 rounded-full ${opt.dot}`} />}
               {opt.label}
             </DropdownMenuItem>
           ))}
