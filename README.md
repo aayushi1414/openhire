@@ -1,6 +1,6 @@
 # Openhire
 
-> ⚠️ This project is in early alpha. Expect breaking changes.
+> ⚠️ This project is in early development phase. Expect breaking changes.
 
 Open-source AI interviewing platform. Self-hosted.
 
