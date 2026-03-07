@@ -4,8 +4,6 @@
 
 Open-source AI interviewing platform. Self-hosted.
 
-<img src=".github/screenshots/05-interview-detail.png" width="100%">
-
 
 ## Features
 - 🎯 **Interview Creation:** Instantly generate tailored interview questions from any job description.
