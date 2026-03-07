@@ -9,24 +9,6 @@ Open-source AI interviewing platform. Self-hosted.
 
 <img src=".github/screenshots/05-interview-detail.png" width="100%">
 
-<div style="display: flex; flex-direction: row; gap: 20px; margin: 20px 0;">
-  <picture style="flex: 1; min-width: 0;">
-    <img src=".github/screenshots/02-dashboard.png" alt="Dashboard" width="100%" style="max-width: 100%;">
-  </picture>
-  <picture style="flex: 1; min-width: 0;">
-    <img src=".github/screenshots/03-create-interview.png" alt="Create Interview" width="100%" style="max-width: 100%;">
-  </picture>
-</div>
-
-<div style="display: flex; flex-direction: row; gap: 20px; margin: 20px 0;">
-  <picture style="flex: 1; min-width: 0;">
-    <img src=".github/screenshots/04-call.png" alt="Call" width="100%" style="max-width: 100%;">
-  </picture>
-  <picture style="flex: 1; min-width: 0;">
-    <img src=".github/screenshots/06-candidate-response.png" alt="Candidate Response" width="100%" style="max-width: 100%;">
-  </picture>
-</div>
-
 
 ## Features
 - 🎯 **Interview Creation:** Instantly generate tailored interview questions from any job description.
