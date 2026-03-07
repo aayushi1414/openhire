@@ -4,9 +4,6 @@
 
 Open-source AI interviewing platform. Self-hosted.
 
-
-## Screenshots
-
 <img src=".github/screenshots/05-interview-detail.png" width="100%">
 
 
