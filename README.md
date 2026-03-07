@@ -1,11 +1,17 @@
 # Openhire
 
-> ⚠️ This project is in early development phase. Expect breaking changes.
+> ⚠️ This project is in early alpha. Expect breaking changes.
 
 Open-source AI interviewing platform. Self-hosted.
 
 
-[![Screenshot](.github/screenshot.png)](https://github.com/brijeshmarch16/openhire)
+## Screenshots
+
+<img src=".github/screenshots/05-interview-detail.png" width="100%">
+<img src=".github/screenshots/02-dashboard.png" width="49%">
+<img src=".github/screenshots/03-create-interview.png" width="49%">
+<img src=".github/screenshots/04-call.png" width="49%">
+<img src=".github/screenshots/06-candidate-response.png" width="49%">
 
 
 ## Features
