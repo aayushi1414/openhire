@@ -8,10 +8,24 @@ Open-source AI interviewing platform. Self-hosted.
 ## Screenshots
 
 <img src=".github/screenshots/05-interview-detail.png" width="100%">
-<img src=".github/screenshots/02-dashboard.png" width="49%">
-<img src=".github/screenshots/03-create-interview.png" width="49%">
-<img src=".github/screenshots/04-call.png" width="49%">
-<img src=".github/screenshots/06-candidate-response.png" width="49%">
+
+<div style="display: flex; flex-direction: row; gap: 20px; margin: 20px 0;">
+  <picture>
+    <img src=".github/screenshots/02-dashboard.png" alt="Dashboard" width="400" style="max-width: 100%;">
+  </picture>
+  <picture>
+    <img src=".github/screenshots/03-create-interview.png" alt="Create Interview" width="400" style="max-width: 100%;">
+  </picture>
+</div>
+
+<div style="display: flex; flex-direction: row; gap: 20px; margin: 20px 0;">
+  <picture>
+    <img src=".github/screenshots/04-call.png" alt="Call" width="400" style="max-width: 100%;">
+  </picture>
+  <picture>
+    <img src=".github/screenshots/06-candidate-response.png" alt="Candidate Response" width="400" style="max-width: 100%;">
+  </picture>
+</div>
 
 
 ## Features
