@@ -4,6 +4,8 @@ AI voice interviewing platform you can host yourself.
 
 > ⚠️ This project is in early alpha. Expect breaking changes.
 
+![OpenHire](.github/screenshots/hero.gif)
+
 ## Features
 
 - **AI Question Generation** - paste a job description or upload a PDF and get tailored interview questions instantly
