@@ -43,5 +43,5 @@ All contributions are welcome. Read the [contributing guide](./CONTRIBUTING.md) 
 
 Licensed under the [MIT license](./LICENSE).
 
----
-Inspired by [FoloUp](https://github.com/FoloUp/FoloUp).
+
+> Inspired by [FoloUp](https://github.com/FoloUp/FoloUp).
