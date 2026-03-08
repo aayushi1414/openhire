@@ -4,20 +4,7 @@ AI voice interviewing platform you can host yourself.
 
 > ⚠️ This project is in early alpha. Expect breaking changes.
 
-## Screenshots
-
-![Dashboard](.github/screenshots/01-dashboard.png)
-
-<table>
-  <tr>
-    <td width="50%"><img src=".github/screenshots/02-create-interview.png" /></td>
-    <td width="50%"><img src=".github/screenshots/03-call.png" /></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src=".github/screenshots/04-interview-detail.png" /></td>
-    <td width="50%"><img src=".github/screenshots/05-candidate-response.png" /></td>
-  </tr>
-</table>
+![OpenHire](.github/screenshots/hero.gif)
 
 ## Features
 
