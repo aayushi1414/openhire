@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CANDIDATE_STATUS_OPTIONS } from "@/lib/constants";
+import { CandidateStatus } from "@/lib/enum";
 
 interface CandidateStatusDropdownProps {
   call_id: string;
@@ -19,7 +20,9 @@ interface CandidateStatusDropdownProps {
 
 export default function CandidateStatusDropdown(props: CandidateStatusDropdownProps) {
   const { call_id, initialStatus } = props;
-  const [candidateStatus, setCandidateStatus] = useState(initialStatus ?? "");
+  const [candidateStatus, setCandidateStatus] = useState(
+    initialStatus || CandidateStatus.NO_STATUS,
+  );
   const [isStatusUpdating, startStatusTransition] = useTransition();
   const router = useRouter();
 

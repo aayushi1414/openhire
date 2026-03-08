@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CANDIDATE_STATUS_OPTIONS } from "@/lib/constants";
+import { CandidateStatus } from "@/lib/enum";
 import { convertSecondstoMMSS, formatTimestampToDateHHMM } from "@/lib/utils";
 import type { InterviewDetailTableResponse } from "@/types/response";
 
@@ -86,7 +87,7 @@ export function useInterviewDetailColumns({
         accessorKey: "candidateStatus",
         size: 100,
         cell: ({ row }) => {
-          const status = row.original.candidateStatus ?? "";
+          const status = row.original.candidateStatus || CandidateStatus.NO_STATUS;
           const option = CANDIDATE_STATUS_OPTIONS.find((o) => o.value === status);
           return (
             <Badge
