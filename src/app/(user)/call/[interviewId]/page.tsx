@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const interview = await getInterviewById(interviewId);
 
   return {
-    title: interview?.name ?? "OpenHire Client",
+    title: interview?.name ?? "OpenHire",
   };
 }
 
