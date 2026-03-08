@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import CreateInterviewCard from "@/components/dashboard/interview/list/create-interview-card";
