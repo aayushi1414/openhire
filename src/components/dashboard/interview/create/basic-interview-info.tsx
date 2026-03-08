@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { InterviewBase, Question } from "@/types/interview";
 import type { Interviewer } from "@/types/interviewer";
@@ -37,7 +36,6 @@ const formSchema = z.object({
     .number()
     .int()
     .refine((val) => val !== 0, "Please select an interviewer"),
-  isAnonymous: z.boolean(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -76,7 +74,6 @@ export default function BasicInterviewInfo(props: BasicInterviewInfoProps) {
       numQuestions: interviewData.questionCount === 0 ? "" : String(interviewData.questionCount),
       duration: interviewData.timeDuration,
       interviewerId: interviewData.interviewerId,
-      isAnonymous: interviewData.isAnonymous,
     },
   });
 
@@ -122,7 +119,6 @@ export default function BasicInterviewInfo(props: BasicInterviewInfoProps) {
         questionCount: Number(values.numQuestions),
         timeDuration: values.duration,
         description: generatedQuestionsResponse.description,
-        isAnonymous: values.isAnonymous,
       });
       setProceed(true);
     } catch {
@@ -145,7 +141,6 @@ export default function BasicInterviewInfo(props: BasicInterviewInfoProps) {
       questionCount: Number(values.numQuestions),
       timeDuration: String(values.duration),
       description: mode === "edit" ? interviewData.description : "",
-      isAnonymous: values.isAnonymous,
     });
     setProceed(true);
   };
@@ -321,26 +316,6 @@ export default function BasicInterviewInfo(props: BasicInterviewInfoProps) {
             setUploadedDocumentContext={setUploadedDocumentContext}
           />
         </Field>
-
-        <Controller
-          name="isAnonymous"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <div className="flex cursor-pointer items-center">
-                <span className="font-medium text-foreground text-sm">Anonymous responses?</span>
-                <Switch
-                  checked={field.value}
-                  className="mt-1 ml-4"
-                  onCheckedChange={(checked) => field.onChange(checked)}
-                />
-              </div>
-              <span className="text-muted-foreground text-xs italic">
-                Note: If not anonymous, the interviewee&apos;s email and name will be collected.
-              </span>
-            </Field>
-          )}
-        />
 
         <Field>
           <div className="mt-1 flex w-full flex-row items-center justify-between gap-3">

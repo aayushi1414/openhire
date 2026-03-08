@@ -14,7 +14,6 @@ interface CreateInterviewPayload {
   description: string;
   objective: string;
   interviewerId: string | null;
-  isAnonymous: boolean;
   logoUrl: string;
   questions: Question[];
   questionCount: number;
@@ -30,7 +29,6 @@ interface UpdateInterviewPayload {
   interviewerId?: number;
   questionCount?: number;
   timeDuration?: string | number;
-  isAnonymous?: boolean;
   isActive?: boolean;
 }
 
@@ -57,7 +55,6 @@ export const createInterview = async (payload: {
       objective: interviewData.objective,
       userId: userId,
       interviewerId: interviewData.interviewerId ? Number(interviewData.interviewerId) : null,
-      isAnonymous: interviewData.isAnonymous,
       logoUrl: interviewData.logoUrl,
       questions: interviewData.questions,
       questionCount: interviewData.questionCount,

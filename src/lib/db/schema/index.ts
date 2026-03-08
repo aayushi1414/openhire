@@ -27,7 +27,6 @@ export const interview = pgTable("interview", {
   userId: text("user_id").references(() => user.id),
   interviewerId: integer("interviewer_id").references(() => interviewer.id),
   isActive: boolean("is_active").default(true),
-  isAnonymous: boolean("is_anonymous").default(false),
   isArchived: boolean("is_archived").default(false),
   logoUrl: text("logo_url"),
   themeColor: text("theme_color"),

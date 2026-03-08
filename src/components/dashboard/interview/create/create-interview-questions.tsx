@@ -87,7 +87,6 @@ export default function CreateInterviewQuestions(props: CreateInterviewQuestions
           interviewerId: Number(interviewData.interviewerId),
           questionCount: interviewData.questionCount,
           timeDuration: interviewData.timeDuration,
-          isAnonymous: interviewData.isAnonymous,
         });
 
         if (!result.success) {

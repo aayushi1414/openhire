@@ -16,7 +16,6 @@ CREATE TABLE "interview" (
 	"user_id" text,
 	"interviewer_id" integer,
 	"is_active" boolean DEFAULT true,
-	"is_anonymous" boolean DEFAULT false,
 	"is_archived" boolean DEFAULT false,
 	"logo_url" text,
 	"theme_color" text,
@@ -58,6 +57,16 @@ CREATE TABLE "response" (
 	"is_ended" boolean DEFAULT false,
 	"is_viewed" boolean DEFAULT false,
 	"tab_switch_count" integer
+);
+--> statement-breakpoint
+CREATE TABLE "session_token" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"token" text NOT NULL,
+	"interview_id" text,
+	"status" text DEFAULT 'unused' NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"used_at" timestamp with time zone,
+	CONSTRAINT "session_token_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
 CREATE TABLE "account" (
@@ -112,6 +121,7 @@ ALTER TABLE "feedback" ADD CONSTRAINT "feedback_interview_id_interview_id_fk" FO
 ALTER TABLE "interview" ADD CONSTRAINT "interview_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "interview" ADD CONSTRAINT "interview_interviewer_id_interviewer_id_fk" FOREIGN KEY ("interviewer_id") REFERENCES "public"."interviewer"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "response" ADD CONSTRAINT "response_interview_id_interview_id_fk" FOREIGN KEY ("interview_id") REFERENCES "public"."interview"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "session_token" ADD CONSTRAINT "session_token_interview_id_interview_id_fk" FOREIGN KEY ("interview_id") REFERENCES "public"."interview"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "account_userId_idx" ON "account" USING btree ("user_id");--> statement-breakpoint
