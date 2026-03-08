@@ -22,7 +22,6 @@ interface MainInterviewDialogProps {
     questionCount: number;
     timeDuration: string;
     interviewerId: number;
-    isAnonymous: boolean;
   };
 }
 
@@ -33,7 +32,6 @@ const createEmptyInterviewData = (): InterviewBase => ({
   objective: "",
   questionCount: 0,
   timeDuration: "",
-  isAnonymous: false,
   questions: [],
   description: "",
   responseCount: 0,
@@ -53,7 +51,6 @@ export default function MainInterviewDialog(props: MainInterviewDialogProps) {
         objective: initialData.objective,
         questionCount: initialData.questionCount,
         timeDuration: initialData.timeDuration,
-        isAnonymous: initialData.isAnonymous,
         questions: initialData.questions,
         description: initialData.description,
         responseCount: 0,

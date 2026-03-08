@@ -16,7 +16,6 @@ export interface InterviewBase {
   objective: string;
   questionCount: number;
   timeDuration: string;
-  isAnonymous: boolean;
   questions: Question[];
   description: string;
   responseCount: number;

@@ -363,7 +363,6 @@ export default function InterviewDetailClient(props: InterviewDetailsClientsProp
             questionCount: interview.questionCount,
             timeDuration: interview.timeDuration,
             interviewerId: interview.interviewerId,
-            isAnonymous: interview.isAnonymous,
           }}
         />
       )}

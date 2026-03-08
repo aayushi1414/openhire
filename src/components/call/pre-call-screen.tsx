@@ -124,63 +124,39 @@ export default function PreCallScreen(props: PreCallScreenProps) {
 
           {/* Right panel — form */}
           <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            {!interview?.isAnonymous && (
-              <FieldGroup>
-                <div>
-                  <p className="mb-2 font-medium text-sm">Enter your name</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Controller
-                      control={control}
-                      name="firstName"
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldContent>
-                            <Input
-                              {...field}
-                              id="firstName"
-                              placeholder="First Name"
-                              aria-invalid={fieldState.invalid}
-                              className="font-normal text-sm"
-                            />
-                          </FieldContent>
-                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                      )}
-                    />
-
-                    <Controller
-                      control={control}
-                      name="lastName"
-                      render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                          <FieldContent>
-                            <Input
-                              {...field}
-                              id="lastName"
-                              placeholder="Last Name"
-                              aria-invalid={fieldState.invalid}
-                              className="font-normal text-sm"
-                            />
-                          </FieldContent>
-                          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                      )}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-2 font-medium text-sm">Enter your email address</p>
+            <FieldGroup>
+              <div>
+                <p className="mb-2 font-medium text-sm">Enter your name</p>
+                <div className="grid grid-cols-2 gap-3">
                   <Controller
                     control={control}
-                    name="email"
+                    name="firstName"
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldContent>
                           <Input
                             {...field}
-                            id="email"
-                            placeholder="Enter your email address"
+                            id="firstName"
+                            placeholder="First Name"
+                            aria-invalid={fieldState.invalid}
+                            className="font-normal text-sm"
+                          />
+                        </FieldContent>
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    control={control}
+                    name="lastName"
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldContent>
+                          <Input
+                            {...field}
+                            id="lastName"
+                            placeholder="Last Name"
                             aria-invalid={fieldState.invalid}
                             className="font-normal text-sm"
                           />
@@ -190,13 +166,35 @@ export default function PreCallScreen(props: PreCallScreenProps) {
                     )}
                   />
                 </div>
-              </FieldGroup>
-            )}
+              </div>
+
+              <div>
+                <p className="mb-2 font-medium text-sm">Enter your email address</p>
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldContent>
+                        <Input
+                          {...field}
+                          id="email"
+                          placeholder="Enter your email address"
+                          aria-invalid={fieldState.invalid}
+                          className="font-normal text-sm"
+                        />
+                      </FieldContent>
+                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                    </Field>
+                  )}
+                />
+              </div>
+            </FieldGroup>
 
             <Button
               type="submit"
               className="h-10 w-full"
-              disabled={isLoading || (!interview?.isAnonymous && !formState.isValid)}
+              disabled={isLoading || !formState.isValid}
             >
               {!isLoading ? "I'm Ready" : <MiniLoader />}
             </Button>
