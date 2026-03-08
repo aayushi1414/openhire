@@ -15,20 +15,6 @@ export const metadata: Metadata = {
   icons: {
     icon: "/browser-client-icon.ico",
   },
-  openGraph: {
-    title: "OpenHire",
-    description: "AI-powered Interviews",
-    siteName: "OpenHire",
-    images: [
-      {
-        url: new URL("/openhire.png", siteUrl).toString(),
-        width: 800,
-        height: 600,
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
