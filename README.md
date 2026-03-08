@@ -1,6 +1,6 @@
 # OpenHire
 
-Open-source AI interviewing platform. Self-hosted.
+AI voice interviewing platform you can host yourself.
 
 > ⚠️ This project is in early alpha. Expect breaking changes.
 
