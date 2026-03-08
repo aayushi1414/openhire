@@ -1,17 +1,19 @@
-# Openhire
+# OpenHire
 
-Open-source AI interviewing platform. Self-hosted.
+AI voice interviewing platform you can host yourself.
 
 > ⚠️ This project is in early alpha. Expect breaking changes.
 
-
 ## Features
-- 🎯 **Interview Creation:** Instantly generate tailored interview questions from any job description.
-- 🔗 **One-Click Sharing:** Generate and share unique interview links with candidates in seconds.
-- 🎙️ **AI Voice Interviews:** Let our AI conduct natural, conversational interviews that adapt to candidate responses.
-- 📊 **Smart Analysis:** Get detailed insights and scores for each interview response, powered by advanced AI.
-- 📈 **Comprehensive Dashboard:** Track all candidate performances and overall stats.
 
+- **AI Question Generation** - paste a job description or upload a PDF and get tailored interview questions instantly
+- **Voice Interviews** - candidates complete interviews via a real-time AI voice call, no human needed
+- **Custom AI Interviewers** - choose from built-in interviewer personas, each with different communication styles
+- **Automated Scoring** - every response is analyzed for communication skills, soft skills, and overall fit
+- **Shareable Interview Links** - send candidates a one-time link, no scheduling or account required
+- **Candidate Pipeline** - manage candidate status (Selected, Potential, Not Selected) from the dashboard
+- **Integrity Monitoring** - detects tab switching during interviews
+- **Interview Analytics** - track completion rates, sentiment distribution, and average duration per interview
 
 ## Tech Stack
 
@@ -26,23 +28,20 @@ Open-source AI interviewing platform. Self-hosted.
 
 ## Documentation
 
-- [Run Locally](./docs/run-locally.md)
-- [Deploy](./docs/deploy.md)
+- [Run Locally](./docs/run-locally.md) - set up your local dev environment
+- [Deploy](./docs/deploy.md) - self-host on your own server
 
 ## Contributing
 
-Please read the [contributing guide](./CONTRIBUTING.md). Stars are appreciated!
+All contributions are welcome. Read the [contributing guide](./CONTRIBUTING.md) before submitting a PR.
 
-## Contributors
-
-[![Contributors](https://contrib.rocks/image?repo=brijeshmarch16/openhire)](https://github.com/brijeshmarch16/openhire/graphs/contributors)
-
-> Made with [contrib.rocks](https://contrib.rocks)
-
-## Acknowledgments
-
-Inspired by [FoloUp](https://github.com/FoloUp/FoloUp).
+- Found a bug? [Open an issue](https://github.com/brijeshmarch16/openhire/issues)
+- Have a feature idea? [Open an issue](https://github.com/brijeshmarch16/openhire/issues) first before building
+- Stars are appreciated!
 
 ## License
 
 Licensed under the [MIT license](./LICENSE).
+
+---
+Inspired by [FoloUp](https://github.com/FoloUp/FoloUp).
