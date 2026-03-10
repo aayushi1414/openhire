@@ -4,7 +4,7 @@ AI voice interviewing platform you can host yourself.
 
 > ⚠️ This project is in early alpha. Expect breaking changes.
 
-![OpenHire](.github/screenshots/hero.gif)
+![OpenHire](public/screenshots/hero.gif)
 
 ## Features
 
@@ -30,8 +30,8 @@ AI voice interviewing platform you can host yourself.
 
 ## Documentation
 
-- [Run Locally](./docs/run-locally.md) - set up your local dev environment
-- [Deploy](./docs/deploy.md) - self-host on your own server
+- [Quick Start](./docs/quick-start.md) - set up your local dev environment
+- [Deployment Guide](./docs/deployment-guide.md) - self-host on your own server
 
 ## Contributing
 

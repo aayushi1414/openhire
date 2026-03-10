@@ -1,4 +1,4 @@
-# Deploy
+# Deployment Guide
 
 Two options depending on your setup:
 
