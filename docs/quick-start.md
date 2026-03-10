@@ -1,4 +1,4 @@
-# Run Locally
+# Quick Start
 
 ## Prerequisites
 
