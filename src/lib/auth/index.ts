@@ -5,7 +5,10 @@ import { db } from "@/lib/db";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
-  emailAndPassword: { enabled: true },
+  emailAndPassword: {
+    enabled: true,
+    disableSignUp: process.env.NEXT_PUBLIC_MARKETING_ENABLED === "true",
+  },
   user: {
     changeEmail: {
       enabled: true,
