@@ -7,10 +7,7 @@ import { cn } from "@/lib/utils";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL as string;
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
   title: "OpenHire",
   description: "AI-powered Interviews",
   icons: {
