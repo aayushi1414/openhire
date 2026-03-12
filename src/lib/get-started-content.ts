@@ -72,7 +72,7 @@ export const GET_STARTED_TABS: GetStartedTab[] = [
             type: "envTable",
             rows: [
               {
-                variable: "NEXT_PUBLIC_SITE_URL & BETTER_AUTH_URL",
+                variable: "BETTER_AUTH_URL",
                 value: [{ type: "inlineCode", value: "http://localhost:3000" }],
               },
               {
@@ -196,7 +196,7 @@ export const GET_STARTED_TABS: GetStartedTab[] = [
             type: "envTable",
             rows: [
               {
-                variable: "NEXT_PUBLIC_SITE_URL & BETTER_AUTH_URL",
+                variable: "BETTER_AUTH_URL",
                 value: [
                   { type: "text", value: "Your Vercel URL (for example, " },
                   { type: "inlineCode", value: "https://your-app.vercel.app" },
@@ -312,7 +312,7 @@ export const GET_STARTED_TABS: GetStartedTab[] = [
             type: "envTable",
             rows: [
               {
-                variable: "NEXT_PUBLIC_SITE_URL & BETTER_AUTH_URL",
+                variable: "BETTER_AUTH_URL",
                 value: [{ type: "inlineCode", value: "http://your-server-ip:3000" }],
               },
               {
